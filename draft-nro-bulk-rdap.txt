@@ -270,7 +270,7 @@ Internet-Draft                  bulk-rdap                     April 2024
 
    *  Scheme: HTTPS
    *  Method: GET
-   *  Path Segment: nroBulkRdap1?objectClasses=<command-separated string
+   *  Path Segment: nroBulkRdap1?objectClasses=<comma-separated string
       of RDAP object class names>
    *  Content-Type: application/rdap+json
 
