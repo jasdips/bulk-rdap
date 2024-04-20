@@ -203,6 +203,11 @@ The client first verifies the JWS string and then decodes the Base64URL-encoded 
 Furthermore, it is RECOMMENDED to follow the guidance from [@!RFC7481, section 3] to secure the bulk data path segment
 for encryption, authentication, and authorization.
 
+# Operational Considerations
+
+It is NOT RECOMMENDED to make the RDAP bulk data available over FTP. Compared to HTTPS, FTP is considered more complex
+to operate, less secure, and less firewall-friendly.
+
 # IANA Considerations
 
 ## RDAP Extensions Registry {#rdap_extensions_registry}
