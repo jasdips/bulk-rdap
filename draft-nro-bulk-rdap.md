@@ -8,7 +8,7 @@ name = "Internet-Draft"
 value = "draft-nro-bulk-rdap-00"
 stream = "IETF"
 status = "standard"
-date = 2024-04-19T00:00:00Z
+date = 2024-04-20T00:00:00Z
 
 [[author]]
 organization="Number Resource Organization"
@@ -19,188 +19,175 @@ email = "secretariat@nro.net"
 
 .# Abstract
 
-To complement the move from Whois to RDAP, this document specifies a new service called Bulk RDAP that an RIR can deploy
+To complement the move from Whois to RDAP, this document specifies a new service named Bulk RDAP that an RIR can deploy
 in lieu of their Bulk Whois service.
 
 {mainmatter}
 
 # Introduction
 
-As the RIRs shift from Whois to RDAP, they would also need an RDAP replacement for their Bulk Whois service. To that
-end, this document specifies a new service named Bulk RDAP that an RIR can deploy in lieu of Bulk Whois. This service is
-intended as a simple, easy-to-implement replacement for Bulk Whois, and leverages its files-based architecture.
+As the RIRs shift from Whois to RDAP, they also need an RDAP replacement for their Bulk Whois service. To that end, this
+document specifies a new service named Bulk RDAP that an RIR can deploy in lieu of Bulk Whois. This service is intended
+as a simple, easy-to-implement replacement for Bulk Whois.
 
-Emulating Bulk Whois, Bulk RDAP comprises separate JSON data files by IP Network, Autonomous System Number, Domain, and
-Entity object classes ([@!RFC9083, section 5]), or a single JSON file containing data for all these object classes, or
-data for some but not all of these object classes (say, just IP Network and Entity objects) in a JSON file. An RIR would
-publish such files for its customers to securely download and consume.
+At a higher level, Bulk RDAP comprises JSON data by IP Network, Autonomous System Number, Domain, and Entity object
+classes ([@!RFC9083, section 5]), plus some JSON metadata. It can be easily extended to include data for any future RDAP
+object class. Furthermore, it is an HTTPS-based service that the RIR customers could use to securely download and
+consume this data.
 
-# JSON File For Single Object Class
+## Requirements Language
 
-In this case, a JSON file contains data for only one object class. It will be a JSON object containing a JSON array for
-all the objects for that class. Additionally:
+The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",
+"NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 [@!RFC2119]
+[@!RFC8174] when, and only when, they appear in all capitals, as shown here.
 
-* Include an "rdapConformance" member at the top, and if needed within an object, to highlight which specifications that
-  data adheres to.
-* Include a "serial" string at the top to help sequence various files for similar data.
-* Include "self" links for each primary object and the secondary objects it contains in order to have parity with the
-  "ref" element in Bulk Whois.
-* For compactness, do not include details for a secondary object beyond its "self" link, "handle" when defined, and
-  relationship to the primary object (e.g., using the "roles" member in an Entity object to related to an IP Network
-  object).
+Indentation and whitespace in examples are provided only to illustrate element relationships, and are not a REQUIRED
+feature of this service.
 
-Here is an elided example of a JSON file containing only IP Network objects:
+"..." in examples is used as shorthand for elements defined outside of this document.
 
-```
-  {
-    "rdapConformance": [ "rdap_level_0", "nro_rdap_profile_0", "nroBulkRdap1", ... ],
-    "serial": "12345",
-    "objects":
-    [
-      {
-        "objectClassName": "ip network",
-        "handle": "XXXX-RIR",
-        "links":
-        [
-          {
-            "value": "https://example.net/ip/2001:db8::/48",
-            "rel": "self",
-            "href": "https://example.net/ip/2001:db8::/48",
-            "type": "application/rdap+json"
-          }
-        ],
-        ...
-        "entities":
-        [
-          {
-            "objectClassName": "entity",
-            "handle": "YYYY-RIR",
-            "roles": [ "administrative", ... ]
-            "links":
-            [
-              {
-                "value": "https://example.net/ip/2001:db8::/48",
-                "rel": "self",
-                "href": "https://example.net/entity/YYYY-RIR",
-                "type": "application/rdap+json"
-              }
-            ],
-          },
-          ...
-        ],
-      },
-      ...
-    ]
-  }
-```
+# Data Format
 
-# JSON File for Multiple Object Classes
-
-Such a JSON file would essentially be a JSON object contain JSON objects by each included object class.
-
-Here is an elided example of a JSON file containing both IP Network and Autonomous System NUmber objects:
+Bulk RDAP data is a JSON object comprising JSON members for metadata, and JSON data for RDAP object classes.
+Semantically, the JSON would look so:
 
 ```
-  {
+{
+  METADATA,
+  DATA_FOR_OBJECT_CLASSES
+}
+```
+
+## Metadata
+
+The following JSON members for metadata MUST be included:
+
+* "rdapConformance" -- An array of strings ([@!RFC9083, section 4.1]) to signal the RDAP extensions the data is based
+  on.
+* "serial" -- A number for sequencing the data snapshots.
+
+## Data For Object Classes
+
+The JSON data for RDAP object classes is an "objects" member that is a JSON array comprising all the objects for one or
+more RDAP object classes. It is RECOMMENDED that an RIR provides bulk data for IP Network, Autonomous System Number,
+Domain, and Entity object classes ([@!RFC9083, section 5]).
+
+Furthermore, within the JSON array:
+
+* The "self" links for each primary object and the secondary objects it contains MUST be included in order to have
+  parity with the "ref" element in Bulk Whois.
+* For compactness, it is NOT RECOMMENDED to include details for a secondary object beside its "self" link, "handle" when
+  defined, and relationship to the primary object (e.g., using the "roles" member in an Entity object to relate to an IP
+  Network object).
+* An "rdapConformance" member MAY be included at the top of a primary object if the RDAP extensions used to produce it
+  are different from those listed in the "rdapConformance" member for metadata.
+
+Here is an elided example of a JSON object containing bulk data for both IP Network and Autonomous System Number object
+classes:
+
+```
+{
+  "rdapConformance": [ "rdap_level_0", "nro_rdap_profile_0", "nroBulkRdap1", ... ],
+  "serial": "12345",
+  "objects":
+  [
     {
-      "rdapConformance": [ "rdap_level_0", "nro_rdap_profile_0", "nroBulkRdap1", ... ],
-      "serial": "12345",
-      "objects":
+      "objectClassName": "ip network",
+      "handle": "XXXX-RIR",
+      "links":
       [
         {
-          "objectClassName": "ip network",
-          "handle": "XXXX-RIR",
+          "value": "https://example.net/ip/2001:db8::/48",
+          "rel": "self",
+          "href": "https://example.net/ip/2001:db8::/48",
+          "type": "application/rdap+json"
+        }
+      ],
+      ...
+      "entities":
+      [
+        {
+          "objectClassName": "entity",
+          "handle": "YYYY-RIR",
+          "roles": [ "administrative", ... ]
           "links":
           [
             {
               "value": "https://example.net/ip/2001:db8::/48",
               "rel": "self",
-              "href": "https://example.net/ip/2001:db8::/48",
+              "href": "https://example.net/entity/YYYY-RIR",
               "type": "application/rdap+json"
             }
           ],
-          ...
-          "entities":
-          [
-            {
-              "objectClassName": "entity",
-              "handle": "YYYY-RIR",
-              "roles": [ "administrative", ... ]
-              "links":
-              [
-                {
-                  "value": "https://example.net/ip/2001:db8::/48",
-                  "rel": "self",
-                  "href": "https://example.net/entity/YYYY-RIR",
-                  "type": "application/rdap+json"
-                }
-              ],
-            },
-            ...
-          ],
         },
         ...
-      ]
+      ],
     },
+    ...
     {
-      "rdapConformance": [ "rdap_level_0", "nro_rdap_profile_0", "nroBulkRdap1", ... ],
-      "serial": "12345",
-      "objects":
+      "objectClassName": "autnum",
+      "handle": "ZZZZ-RIR",
+      "links":
       [
         {
-          "objectClassName": "autnum",
-          "handle": "ZZZZ-RIR",
+          "value": "https://example.net/autnum/65537",
+          "rel": "self",
+          "href": "https://example.net/autnum/65537",
+          "type": "application/rdap+json"
+        }
+      ],
+      ...
+      "entities":
+      [
+        {
+          "objectClassName": "entity",
+          "handle": "YYYY-RIR",
+          "roles": [ "administrative", ... ]
           "links":
           [
             {
               "value": "https://example.net/autnum/65537",
               "rel": "self",
-              "href": "https://example.net/autnum/65537",
+              "href": "https://example.net/entity/YYYY-RIR",
               "type": "application/rdap+json"
             }
           ],
-          ...
-          "entities":
-          [
-            {
-              "objectClassName": "entity",
-              "handle": "YYYY-RIR",
-              "roles": [ "administrative", ... ]
-              "links":
-              [
-                {
-                  "value": "https://example.net/autnum/65537",
-                  "rel": "self",
-                  "href": "https://example.net/entity/YYYY-RIR",
-                  "type": "application/rdap+json"
-                }
-              ],
-            },
-            ...
-          ],
         },
         ...
-      ]
-    }
-  }
+      ],
+    },
+    ...
+  ]
+}
 ```
-
-Note that there is some repetition of metadata for each object class' JSON data, but it is a reasonable trade-off for
-implementation simplicity.
 
 # Extension Identifier
 
-Include the "nroBulkRdap1" extension identifier in the top-level "rdapConformance" member to signal adherence to this
-specification.
+The "nroBulkRdap1" extension identifier (see (#rdap_extensions_registry)) MUST be included in the top-level
+"rdapConformance" member of the JSON object for bulk data, to signal adherence to this specification.
 
-Note how the extension identifier for the NRO RDAP Profile ("nro_rdap_profile_0" as of this writing) is included as
-well. The Bulk RDAP extension supersedes the NRO RDAP Profile extension to help accommodate data compactness in JSON
-files. For example, to selectively include data for secondary objects.
+It is RECOMMENDED to include the extension identifier for the NRO RDAP Profile ("nro_rdap_profile_0") in the top-level
+"rdapConformance" member. But, when in conflict, the Bulk RDAP extension requirements SHOULD supersede the NRO RDAP
+Profile extension requirements, primarily to afford bulk data compactness.
 
 # Security Considerations
 
 Use JSON Web Signature (JWS) [@!RFC7515] / JSON Web Key (JWK) [@RFC7517] to sign and validate JSON files. It is
 RECOMMENDED that Elliptic Curve Digital Signature Algorithm (ECDSA) ([@RFC7518, section 3.4]) be used for signing and
 validating such files.
+
+# IANA Considerations
+
+## RDAP Extensions Registry {#rdap_extensions_registry}
+
+IANA is requested to register the following value in the RDAP Extensions Registry at
+https://www.iana.org/assignments/rdap-extensions/:
+
+* Extension identifier: nroBulkRdap1
+* Registry operator: Regional Internet Registries (RIRs), including at national and local levels.
+* Published specification: This document.
+* Contact: Number Resource Organization (NRO) <secretariat@nro.net>
+* Intended usage: This NRO-level extension describes version 1 of a method to access bulk data from the RIRs through
+  RDAP.
 
 {backmatter}
