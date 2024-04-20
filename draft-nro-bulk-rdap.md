@@ -57,7 +57,7 @@ The following JSON members for metadata MUST be included:
 * "rdapConformance" -- An array of strings ([@!RFC9083, section 4.1]) to signal the RDAP extensions the data is based
   on.
 * "serial" -- An unsigned 32-bit number for sequencing the data snapshots. It is RECOMMENDED to follow the serial
-  number-wrapping arithmetic from [@RFC1982].
+  number-wrapping arithmetic from [@!RFC1982].
 
 ## Data For Object Classes
 
@@ -183,8 +183,8 @@ https://example.net/nroBulkRdap1?objectClasses=ip network,autnum,entity
 
 # Security Considerations
 
-It is RECOMMENDED to use JSON Web Signature (JWS) [@!RFC7515] / JSON Web Key (JWK) [@RFC7517] to sign and validate JSON
-data. It is further RECOMMENDED that Elliptic Curve Digital Signature Algorithm (ECDSA) ([@RFC7518, section 3.4]) be
+It is RECOMMENDED to use JSON Web Signature (JWS) [@!RFC7515] / JSON Web Key (JWK) [@!RFC7517] to sign and validate JSON
+data. It is further RECOMMENDED that Elliptic Curve Digital Signature Algorithm (ECDSA) ([@!RFC7518, section 3.4]) be
 used for JWS.
 
 When JWS and JWK are used to sign JSON data, the JWS string is returned in the HTTP response for the download call. The
@@ -195,7 +195,7 @@ encryption, authentication, and authorization.
 
 # Operational Considerations
 
-It is NOT RECOMMENDED to make the RDAP bulk data available over FTP ([@!RFC959]). Compared to HTTPS, FTP is considered
+It is NOT RECOMMENDED to make the RDAP bulk data available over FTP ([@RFC959]). Compared to HTTPS, FTP is considered
 more complex to operate, less secure, and less firewall-friendly.
 
 # IANA Considerations
