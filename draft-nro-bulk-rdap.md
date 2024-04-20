@@ -48,15 +48,7 @@ feature of this service.
 
 # Data Format
 
-The Bulk RDAP data is a JSON object comprising JSON members for metadata, and JSON data for RDAP object classes.
-Semantically, the JSON would look so:
-
-```
-{
-  METADATA,
-  DATA_FOR_OBJECT_CLASSES
-}
-```
+The Bulk RDAP data is a JSON object comprising JSON members for metadata and JSON data for RDAP object classes.
 
 ## Metadata
 
@@ -119,8 +111,7 @@ classes:
               "rel": "self",
               "href": "https://example.net/entity/YYYY-RIR",
               "type": "application/rdap+json"
-            },
-            ...
+            }
           ],
         },
         ...
@@ -154,8 +145,7 @@ classes:
               "rel": "self",
               "href": "https://example.net/entity/YYYY-RIR",
               "type": "application/rdap+json"
-            },
-            ...
+            }
           ],
         },
         ...
@@ -182,8 +172,8 @@ Method: GET
 Path Segment: nroBulkRdap1?objectClasses=<command-separated string of RDAP object class names>
 Content-Type: application/rdap+json
 
-Using comma (',') to delimit multiple object class names for the value of the "objectClasses" query parameter assumes
-that there are no commas in future RDAP object class names.
+Using comma (',') to delimit multiple object class names for the value of the "objectClasses" query parameter safely
+assumes that there will be no commas in future RDAP object class names.
 
 Here is an example URL to get bulk data for IP Network, Autonomous System Number, and Entity object classes:
 
@@ -197,16 +187,16 @@ It is RECOMMENDED to use JSON Web Signature (JWS) [@!RFC7515] / JSON Web Key (JW
 data. It is further RECOMMENDED that Elliptic Curve Digital Signature Algorithm (ECDSA) ([@RFC7518, section 3.4]) be
 used for JWS.
 
-If JWS and JWK are used to sign JSON data, the JWS string is returned in the HTTP response for the download call.
-The client first verifies the JWS string and then decodes the Base64URL-encoded payload for JSON data.
+When JWS and JWK are used to sign JSON data, the JWS string is returned in the HTTP response for the download call. The
+client first verifies the JWS string and then decodes the Base64URL-encoded payload for JSON data.
 
-Furthermore, it is RECOMMENDED to follow the guidance from [@!RFC7481, section 3] to secure the bulk data path segment
-for encryption, authentication, and authorization.
+Furthermore, it is RECOMMENDED to follow the guidance from [@!RFC7481, section 3] to secure the bulk data URL for
+encryption, authentication, and authorization.
 
 # Operational Considerations
 
-It is NOT RECOMMENDED to make the RDAP bulk data available over FTP. Compared to HTTPS, FTP is considered more complex
-to operate, less secure, and less firewall-friendly.
+It is NOT RECOMMENDED to make the RDAP bulk data available over FTP ([@!RFC959]). Compared to HTTPS, FTP is considered
+more complex to operate, less secure, and less firewall-friendly.
 
 # IANA Considerations
 
@@ -219,8 +209,8 @@ https://www.iana.org/assignments/rdap-extensions/:
 * Registry operator: Regional Internet Registries (RIRs), including at national and local levels.
 * Published specification: This document.
 * Contact: Number Resource Organization (NRO) <secretariat@nro.net>
-* Intended usage: This NRO-level extension describes version 1 of a method to access bulk data from the RIRs through
-  RDAP.
+* Intended usage: This NRO-level extension describes version 1 of a method to access registration data in bulk from the
+  RIRs through RDAP.
 
 # Acknowledgements
 
@@ -234,9 +224,9 @@ especially for the serial number and JSON Web Signature ideas.
 Though this specification is intended to provide access to bulk data from the RIRs through RDAP, it MAY also be used for
 the following potential use cases:
 
-* Escrow: Although there is no formal requirement for the RIRs to escrow their registration data, the JSON data format
-  described here could be used for that purpose.
-* Data ingestion for RDAP server: The RIR customers are typically required to report back on the utilization of the
+* Escrow: Although there is presently no formal requirement for the RIRs to escrow their registration data, the JSON
+  data format described here could be used for that purpose in the future.
+* Data ingestion for RDAP server: The RIR customers are typically required to report back on the utilization of their
   registered IP addresses and autonomous system numbers to the RIR. The customer could locally run an RDAP server and
   upload the utilization info for its number resources in the form of RDAP objects. The JSON data format described here
-  could be used for ingesting that data onto their local RDAP server.
+  could be used for ingesting such data onto their local RDAP server.
