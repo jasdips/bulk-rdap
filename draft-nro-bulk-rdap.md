@@ -178,7 +178,7 @@ assumes that there will be no commas in future RDAP object class names.
 Here is an example URL to get bulk data for IP Network, Autonomous System Number, and Entity object classes:
 
 ```
-https://exaample.net/nroBulkRdap1?objectClasses=ip network,autnum,entity
+https://example.net/nroBulkRdap1?objectClasses=ip network,autnum,entity
 ```
 
 # Security Considerations
