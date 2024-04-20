@@ -289,7 +289,7 @@ Internet-Draft                  bulk-rdap                     April 2024
    Here is an example URL to get bulk data for IP Network, Autonomous
    System Number, and Entity object classes:
 
-https://exaample.net/nroBulkRdap1?objectClasses=ip network,autnum,entity
+ https://example.net/nroBulkRdap1?objectClasses=ip network,autnum,entity
 
 5.  Security Considerations
 
