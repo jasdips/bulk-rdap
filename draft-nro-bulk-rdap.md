@@ -19,16 +19,16 @@ email = "secretariat@nro.net"
 
 .# Abstract
 
-To complement the move from Whois to RDAP, this document specifies a new service named Bulk RDAP that an RIR can deploy
-in lieu of their Bulk Whois service.
+To complement the move from Whois to RDAP for the RIRs (Regional Internet Registries), this document specifies a new
+service, named Bulk RDAP, that an RIR can deploy in lieu of their Bulk Whois service.
 
 {mainmatter}
 
 # Introduction
 
 As the RIRs shift from Whois to RDAP, they also need an RDAP replacement for their Bulk Whois service. To that end, this
-document specifies a new service named Bulk RDAP that an RIR can deploy in lieu of Bulk Whois. This service is intended
-as a simple, easy-to-implement replacement for Bulk Whois.
+document specifies a new service, named Bulk RDAP, that an RIR can deploy in lieu of Bulk Whois. This service is
+intended to be a simple, easy-to-implement replacement for Bulk Whois.
 
 At a higher level, Bulk RDAP comprises JSON data by IP Network, Autonomous System Number, Domain, and Entity object
 classes ([@!RFC9083, section 5]), plus some JSON metadata. It can be easily extended to include data for any future RDAP
@@ -48,7 +48,7 @@ feature of this service.
 
 # Data Format
 
-Bulk RDAP data is a JSON object comprising JSON members for metadata, and JSON data for RDAP object classes.
+The Bulk RDAP data is a JSON object comprising JSON members for metadata, and JSON data for RDAP object classes.
 Semantically, the JSON would look so:
 
 ```
@@ -64,7 +64,8 @@ The following JSON members for metadata MUST be included:
 
 * "rdapConformance" -- An array of strings ([@!RFC9083, section 4.1]) to signal the RDAP extensions the data is based
   on.
-* "serial" -- A number for sequencing the data snapshots.
+* "serial" -- An unsigned 32-bit number for sequencing the data snapshots. It is RECOMMENDED to follow the serial
+  number-wrapping arithmetic from [@RFC1982].
 
 ## Data For Object Classes
 
@@ -74,8 +75,8 @@ Domain, and Entity object classes ([@!RFC9083, section 5]).
 
 Furthermore, within the JSON array:
 
-* The "self" links for each primary object and the secondary objects it contains MUST be included in order to have
-  parity with the "ref" element in Bulk Whois.
+* The "self" links for each primary object and the secondary objects it contains MUST be included to have parity with
+  the "ref" element in Bulk Whois.
 * For compactness, it is NOT RECOMMENDED to include details for a secondary object beside its "self" link, "handle" when
   defined, and relationship to the primary object (e.g., using the "roles" member in an Entity object to relate to an IP
   Network object).
@@ -101,7 +102,8 @@ classes:
           "rel": "self",
           "href": "https://example.net/ip/2001:db8::/48",
           "type": "application/rdap+json"
-        }
+        },
+        ...
       ],
       ...
       "entities":
@@ -117,7 +119,8 @@ classes:
               "rel": "self",
               "href": "https://example.net/entity/YYYY-RIR",
               "type": "application/rdap+json"
-            }
+            },
+            ...
           ],
         },
         ...
@@ -134,7 +137,8 @@ classes:
           "rel": "self",
           "href": "https://example.net/autnum/65537",
           "type": "application/rdap+json"
-        }
+        },
+        ...
       ],
       ...
       "entities":
@@ -150,7 +154,8 @@ classes:
               "rel": "self",
               "href": "https://example.net/entity/YYYY-RIR",
               "type": "application/rdap+json"
-            }
+            },
+            ...
           ],
         },
         ...
@@ -166,15 +171,37 @@ classes:
 The "nroBulkRdap1" extension identifier (see (#rdap_extensions_registry)) MUST be included in the top-level
 "rdapConformance" member of the JSON object for bulk data, to signal adherence to this specification.
 
-It is RECOMMENDED to include the extension identifier for the NRO RDAP Profile ("nro_rdap_profile_0") in the top-level
-"rdapConformance" member. But, when in conflict, the Bulk RDAP extension requirements SHOULD supersede the NRO RDAP
-Profile extension requirements, primarily to afford bulk data compactness.
+It is RECOMMENDED to also include the extension identifier for the NRO RDAP Profile ("nro_rdap_profile_0") in the
+top-level "rdapConformance" member. But, when in conflict, the Bulk RDAP extension requirements SHOULD supersede the NRO
+RDAP Profile extension requirements, primarily to afford bulk data compactness.
+
+# Bulk Data URL
+
+Scheme: HTTPS
+Method: GET
+Path Segment: nroBulkRdap1?objectClasses=<command-separated string of RDAP object class names>
+Content-Type: application/rdap+json
+
+Using comma (',') to delimit multiple object class names for the value of the "objectClasses" query parameter assumes
+that there are no commas in future RDAP object class names.
+
+Here is an example URL to get bulk data for IP Network, Autonomous System Number, and Entity object classes:
+
+```
+https://exaample.net/nroBulkRdap1?objectClasses=ip network,autnum,entity
+```
 
 # Security Considerations
 
-Use JSON Web Signature (JWS) [@!RFC7515] / JSON Web Key (JWK) [@RFC7517] to sign and validate JSON files. It is
-RECOMMENDED that Elliptic Curve Digital Signature Algorithm (ECDSA) ([@RFC7518, section 3.4]) be used for signing and
-validating such files.
+It is RECOMMENDED to use JSON Web Signature (JWS) [@!RFC7515] / JSON Web Key (JWK) [@RFC7517] to sign and validate JSON
+data. It is further RECOMMENDED that Elliptic Curve Digital Signature Algorithm (ECDSA) ([@RFC7518, section 3.4]) be
+used for JWS.
+
+If JWS and JWK are used to sign JSON data, the JWS string is returned in the HTTP response for the download call.
+The client first verifies the JWS string and then decodes the Base64URL-encoded payload for JSON data.
+
+Furthermore, it is RECOMMENDED to follow the guidance from [@!RFC7481, section 3] to secure the bulk data path segment
+for encryption, authentication, and authorization.
 
 # IANA Considerations
 
