@@ -217,4 +217,21 @@ https://www.iana.org/assignments/rdap-extensions/:
 * Intended usage: This NRO-level extension describes version 1 of a method to access bulk data from the RIRs through
   RDAP.
 
+# Acknowledgements
+
+This work is influenced by the earlier RDAP Mirroring Protocol proposal ([@?I-D.harrison-regext-rdap-mirroring]),
+especially for the serial number and JSON Web Signature ideas.
+
 {backmatter}
+
+# Other Potential Use Cases
+
+Though this specification is intended to provide access to bulk data from the RIRs through RDAP, it MAY also be used for
+the following potential use cases:
+
+* Escrow: Although there is no formal requirement for the RIRs to escrow their registration data, the JSON data format
+  described here could be used for that purpose.
+* Data ingestion for RDAP server: The RIR customers are typically required to report back on the utilization of the
+  registered IP addresses and autonomous system numbers to the RIR. The customer could locally run an RDAP server and
+  upload the utilization info for its number resources in the form of RDAP objects. The JSON data format described here
+  could be used for ingesting that data onto their local RDAP server.
