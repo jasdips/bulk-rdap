@@ -1,24 +1,19 @@
 %%%
-Title = "Bulk RDAP Data"
-area = "Applications and Real-Time Area (ART)"
-workgroup = "Registration Protocols Extensions (regext)"
-abbrev = "bulk-rdap-data"
+Title = "Bulk RDAP"
+abbrev = "bulk-rdap"
 ipr= "trust200902"
 
 [seriesInfo]
 name = "Internet-Draft"
-value = "draft-nro-bulk-rdap-data-00"
+value = "draft-nro-bulk-rdap-00"
 stream = "IETF"
 status = "standard"
 date = 2024-04-19T00:00:00Z
 
 [[author]]
-initials="J."
-surname="Singh"
-fullname="Jasdip Singh"
-organization="ARIN"
+organization="Number Resource Organization"
 [author.address]
-email = "jasdips@arin.net"
+email = "secretariat@nro.net"
 
 %%%
 
