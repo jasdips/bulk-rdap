@@ -167,10 +167,10 @@ RDAP Profile extension requirements, primarily to afford bulk data compactness.
 
 # Bulk Data URL
 
-Scheme: HTTPS
-Method: GET
-Path Segment: nroBulkRdap1?objectClasses=<command-separated string of RDAP object class names>
-Content-Type: application/rdap+json
+* Scheme: HTTPS
+* Method: GET
+* Path Segment: nroBulkRdap1?objectClasses=<command-separated string of RDAP object class names>
+* Content-Type: application/rdap+json
 
 Using comma (',') to delimit multiple object class names for the value of the "objectClasses" query parameter safely
 assumes that there will be no commas in future RDAP object class names.
