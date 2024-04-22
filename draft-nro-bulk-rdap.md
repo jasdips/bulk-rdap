@@ -8,7 +8,7 @@ name = "Internet-Draft"
 value = "draft-nro-bulk-rdap-00"
 stream = "IETF"
 status = "standard"
-date = 2024-04-20T00:00:00Z
+date = 2024-04-22T00:00:00Z
 
 [[author]]
 organization="Number Resource Organization"
@@ -32,8 +32,7 @@ intended to be a simple, easy-to-implement replacement for Bulk Whois.
 
 At a higher level, Bulk RDAP comprises JSON data by IP Network, Autonomous System Number, Domain, and Entity object
 classes ([@!RFC9083, section 5]), plus some JSON metadata. It can be easily extended to include data for any future RDAP
-object class. Furthermore, it is an HTTPS-based service that the RIR customers could use to securely download and
-consume this data.
+object class. Furthermore, it is an HTTPS-based service that the RIR customers could use to securely get this data.
 
 ## Requirements Language
 
@@ -46,7 +45,7 @@ feature of this service.
 
 "..." in examples is used as shorthand for elements defined outside of this document.
 
-# Data Format
+# Data Format {#data_format}
 
 The Bulk RDAP data is a JSON object comprising JSON members for metadata and JSON data for RDAP object classes.
 
@@ -170,6 +169,7 @@ RDAP Profile extension requirements, primarily to afford bulk data compactness.
 * Scheme: HTTPS
 * Method: GET
 * Path Segment: nroBulkRdap1?objectClasses=<comma-separated string of RDAP object class names>
+* Returns: Bulk data (see (#data_format))
 * Content-Type: application/rdap+json
 
 Using comma (',') to delimit multiple object class names for the value of the "objectClasses" query parameter safely
@@ -181,13 +181,23 @@ Here is an example URL to get bulk data for IP Network, Autonomous System Number
 https://example.net/nroBulkRdap1?objectClasses=ip network,autnum,entity
 ```
 
+For a 200 OK response ([@!RFC9110, section 15.3.1]), the server MUST return a JSON object with its "objects" member
+filled with all the objects for the RDAP object classes listed in the "objectClasses" query parameter.
+
+If the RDAP object classes listed in the "objectClasses" query parameter are all valid ([@!RFC9083, section 5], or a
+future RDAP object class) but the bulk data functionality has not been implemented for some of them, the server SHOULD
+return a 501 Not Implemented response ([@!RFC9110, section 15.6.2]).
+
+If one or more of the RDAP object classes listed in the "objectClasses" query parameter are invalid, the server SHOULD
+return a 400 Bad Request response ([@!RFC9110, section 15.5.1]).
+
 # Security Considerations
 
 It is RECOMMENDED to use JSON Web Signature (JWS) [@!RFC7515] / JSON Web Key (JWK) [@!RFC7517] to sign and validate JSON
 data. It is further RECOMMENDED that Elliptic Curve Digital Signature Algorithm (ECDSA) ([@!RFC7518, section 3.4]) be
 used for JWS.
 
-When JWS and JWK are used to sign JSON data, the JWS string is returned in the HTTP response for the download call. The
+When JWS and JWK are used to sign JSON data, the JWS string is returned in the HTTP response for the bulk data call. The
 client first verifies the JWS string and then decodes the Base64URL-encoded payload for JSON data.
 
 Furthermore, it is RECOMMENDED to follow the guidance from [@!RFC7481, section 3] to secure the bulk data URL for
