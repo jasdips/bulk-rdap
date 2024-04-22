@@ -30,9 +30,10 @@ As the RIRs shift from Whois to RDAP, they also need an RDAP replacement for the
 document specifies a new service, named Bulk RDAP, that an RIR can deploy in lieu of Bulk Whois. This service is
 intended to be a simple, easy-to-implement replacement for Bulk Whois.
 
-At a higher level, Bulk RDAP comprises JSON data by IP Network, Autonomous System Number, Domain, and Entity object
-classes ([@!RFC9083, section 5]), plus some JSON metadata. It can be easily extended to include data for any future RDAP
-object class. Furthermore, it is an HTTPS-based service that the RIR customers could use to securely get this data.
+At a higher level, Bulk RDAP comprises JSON data by IP Network, Autonomous System Number, Domain, Nameserver, and Entity
+object classes ([@!RFC9083, section 5]), plus some JSON metadata. It can be easily extended to include data for any
+future RDAP object class. Furthermore, it is an HTTPS-based service that the RIR customers could use to securely get
+this data.
 
 ## Requirements Language
 
@@ -62,7 +63,7 @@ The following JSON members for metadata MUST be included:
 
 The JSON data for RDAP object classes is an "objects" member that is a JSON array comprising all the objects for one or
 more RDAP object classes. It is RECOMMENDED that an RIR provides bulk data for IP Network, Autonomous System Number,
-Domain, and Entity object classes ([@!RFC9083, section 5]).
+Domain, Nameserver, and Entity object classes ([@!RFC9083, section 5]).
 
 Furthermore, within the JSON array:
 
