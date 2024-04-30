@@ -240,12 +240,12 @@ especially for the serial number and JSON Web Signature ideas.
 
 # Other Potential Use Cases
 
-Though this specification is intended to provide access to bulk data from the RIRs through RDAP, it MAY also be used for
+Though this specification is intended to provide access to bulk data from the RIRs through RDAP, it may also be used for
 the following potential use cases:
 
-* Escrow: Although there is presently no formal requirement for the RIRs to escrow their registration data, the JSON
-  data format described here could be used for that purpose in the future.
-* Data ingestion for RDAP server: The RIR customers are typically required to report back on the utilization of their
-  registered IP addresses and autonomous system numbers to the RIR. The customer could locally run an RDAP server and
-  upload the utilization info for its number resources in the form of RDAP objects. The JSON data format described here
-  could be used for ingesting such data onto their local RDAP server.
+* Escrow: Although there is presently no requirement for the RIRs to escrow their registration data, the JSON data
+  format described here could be used for that purpose in the future.
+* Resource utilization data upload to an RDAP server: The RIR customers are typically required to report back on the
+  utilization of their allocated IP addresses and autonomous system numbers to the RIR. A customer could locally run an
+  RDAP server and upload the utilization data for its number resources in the form of RDAP objects. The JSON data format
+  described here could be used for periodically uploading such data to a local RDAP server.
