@@ -46,7 +46,7 @@ feature of this service.
 
 "..." in examples is used as shorthand for elements defined outside of this document.
 
-# Data Format {#data_format}
+# Bulk Data Format {#bulk_data_format}
 
 The data returned for a Bulk RDAP request ((#bulk_rdap_url)) is a JSON object comprising JSON members for metadata and
 JSON data for a single RDAP object class.
@@ -60,7 +60,7 @@ The following JSON members for metadata MUST be included:
 * "serial" -- An unsigned 32-bit number for sequencing the data snapshots. It is RECOMMENDED to follow the serial
   number-wrapping arithmetic from [@!RFC1982].
 
-## Data For Object Classes
+## Data for an Object Class
 
 The JSON data for an RDAP object class is an "objects" member -- a JSON array comprising all the objects for that class.
 It is RECOMMENDED that an RIR provide bulk data for IP Network, Autonomous System Number, Domain, Nameserver, and Entity
@@ -168,6 +168,7 @@ Here is an elided example of a JSON object containing bulk data for the IP Netwo
   ]
 }
 ```
+
 _Figure 1_
 
 # Extension Identifier
@@ -184,15 +185,19 @@ RDAP Profile extension requirements, primarily to afford bulk data compactness.
 * Scheme: HTTPS
 * Method: GET
 * Path Segment: nroBulkRdap1?objectClass=<RDAP object class name>
-* Returns: Bulk data as either JSON data ((#data_format)) or JSON Web Signature (JWS) string
+* Returns: Bulk data as either JSON data ((#bulk_data_format)) or JSON Web Signature (JWS) string
   ((#security_considerations))
 * Content-Type: application/rdap+json
+
+Limiting the query to a single RDAP object class in the Bulk RDAP URL should result in a simpler service implementation,
+as well as better performance when serving requests.
 
 Here is an example URL to get bulk data for the IP Network object class:
 
 ```
 https://example.net/nroBulkRdap1?objectClass=ip%20network
 ```
+
 _Figure 2_
 
 For a 200 OK response ([@!RFC9110, section 15.3.1]), the server MUST return a JSON object with its "objects" member
@@ -211,8 +216,8 @@ It is RECOMMENDED that JSON Web Signature (JWS) [@!RFC7515] and JSON Web Key (JW
 validate JSON data for the Bulk RDAP. It is further RECOMMENDED that Elliptic Curve Digital Signature Algorithm (ECDSA)
 ([@!RFC7518, section 3.4]) be used for JWS.
 
-When JWS and JWK are used to sign JSON data, the JWS string is returned in the HTTP response for the Bulk RDAP request.
-The client first verifies the JWS string and then decodes the Base64URL-encoded payload for JSON data.
+When the server uses JWS and JWK to sign JSON data, a JWS string is returned in the HTTP response for a Bulk RDAP
+request. The client then verifies the JWS string before decoding the Base64URL-encoded payload for JSON data.
 
 Furthermore, it is RECOMMENDED that the guidance from [@!RFC7481, section 3] be followed to secure the Bulk RDAP URL for
 encryption, authentication, and authorization.
@@ -245,12 +250,7 @@ especially for the serial number and JSON Web Signature ideas.
 
 # Other Potential Use Cases
 
-Though this specification is intended to provide access to bulk data from the RIRs through RDAP, it may also be used for
-the following potential use cases:
+## Escrow
 
-* Escrow: Although there is presently no requirement for the RIRs to escrow their registration data, the JSON data
-  format described here could be used for that purpose in the future.
-* Resource utilization data upload to an RDAP server: The RIR customers are typically required to report back on the
-  utilization of their allocated IP addresses and autonomous system numbers to the RIR. A customer could locally run an
-  RDAP server and upload the utilization data for its number resources in the form of RDAP objects. The JSON data format
-  described here could be used for periodically uploading such data to a local RDAP server.
+Although there is presently no requirement for the RIRs to escrow their registration data, the JSON data format
+described here could be used for that purpose in the future.
