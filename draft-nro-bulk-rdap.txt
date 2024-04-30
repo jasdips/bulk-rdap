@@ -3,9 +3,9 @@
 
 
 Network Working Group                       Number Resource Organization
-Internet-Draft                                             22 April 2024
+Internet-Draft                                             30 April 2024
 Intended status: Standards Track                                        
-Expires: 24 October 2024
+Expires: 1 November 2024
 
 
                                Bulk RDAP
@@ -33,7 +33,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 24 October 2024.
+   This Internet-Draft will expire on 1 November 2024.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-                         Expires 24 October 2024                [Page 1]
+                         Expires 1 November 2024                [Page 1]
 
 Internet-Draft                  bulk-rdap                     April 2024
 
@@ -65,11 +65,12 @@ Table of Contents
    2.  Data Format . . . . . . . . . . . . . . . . . . . . . . . . .   3
      2.1.  Metadata  . . . . . . . . . . . . . . . . . . . . . . . .   3
      2.2.  Data For Object Classes . . . . . . . . . . . . . . . . .   3
+     2.3.  Example . . . . . . . . . . . . . . . . . . . . . . . . .   3
    3.  Extension Identifier  . . . . . . . . . . . . . . . . . . . .   5
    4.  Bulk Data URL . . . . . . . . . . . . . . . . . . . . . . . .   5
    5.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
-   6.  Operational Considerations  . . . . . . . . . . . . . . . . .   6
-   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
+   6.  Operational Considerations  . . . . . . . . . . . . . . . . .   7
+   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
      7.1.  RDAP Extensions Registry  . . . . . . . . . . . . . . . .   7
    8.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   7
    9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   7
@@ -108,8 +109,7 @@ Table of Contents
 
 
 
-
-                         Expires 24 October 2024                [Page 2]
+                         Expires 1 November 2024                [Page 2]
 
 Internet-Draft                  bulk-rdap                     April 2024
 
@@ -134,9 +134,9 @@ Internet-Draft                  bulk-rdap                     April 2024
 
 2.2.  Data For Object Classes
 
-   The JSON data for RDAP object classes is an "objects" member that is
-   a JSON array comprising all the objects for one or more RDAP object
-   classes.  It is RECOMMENDED that an RIR provides bulk data for IP
+   The JSON data for RDAP object classes is an "objects" member -- a
+   JSON array comprising all the objects for one or more RDAP object
+   classes.  It is RECOMMENDED that an RIR provide bulk data for IP
    Network, Autonomous System Number, Domain, Nameserver, and Entity
    object classes (Section 5 of [RFC9083]).
 
@@ -154,6 +154,8 @@ Internet-Draft                  bulk-rdap                     April 2024
       different from those listed in the "rdapConformance" member for
       metadata.
 
+2.3.  Example
+
    Here is an elided example of a JSON object containing bulk data for
    both IP Network and Autonomous System Number object classes:
 
@@ -163,96 +165,100 @@ Internet-Draft                  bulk-rdap                     April 2024
 
 
 
-
-
-                         Expires 24 October 2024                [Page 3]
+                         Expires 1 November 2024                [Page 3]
 
 Internet-Draft                  bulk-rdap                     April 2024
 
 
-{
-  "rdapConformance": [ "rdap_level_0", "nro_rdap_profile_0", "nroBulkRdap1", ... ],
-  "serial": "12345",
-  "objects":
-  [
-    {
-      "objectClassName": "ip network",
-      "handle": "XXXX-RIR",
-      "links":
-      [
-        {
-          "value": "https://example.net/ip/2001:db8::/48",
-          "rel": "self",
-          "href": "https://example.net/ip/2001:db8::/48",
-          "type": "application/rdap+json"
-        },
-        ...
-      ],
-      ...
-      "entities":
-      [
-        {
-          "objectClassName": "entity",
-          "handle": "YYYY-RIR",
-          "roles": [ "administrative", ... ]
-          "links":
-          [
-            {
-              "value": "https://example.net/ip/2001:db8::/48",
-              "rel": "self",
-              "href": "https://example.net/entity/YYYY-RIR",
-              "type": "application/rdap+json"
-            }
-          ],
-        },
-        ...
-      ],
-    },
-    ...
-    {
-      "objectClassName": "autnum",
-      "handle": "ZZZZ-RIR",
-      "links":
-      [
-        {
-          "value": "https://example.net/autnum/65537",
-          "rel": "self",
-          "href": "https://example.net/autnum/65537",
+   {
+     "rdapConformance":
+     [
+       "rdap_level_0",
+       "nro_rdap_profile_0",
+       "nroBulkRdap1",
+       ...
+     ],
+     "serial": "12345",
+     "objects":
+     [
+       {
+         "objectClassName": "ip network",
+         "handle": "XXXX-RIR",
+         "links":
+         [
+           {
+             "value": "https://example.net/ip/2001:db8::/48",
+             "rel": "self",
+             "href": "https://example.net/ip/2001:db8::/48",
+             "type": "application/rdap+json"
+           },
+           ...
+         ],
+         ...
+         "entities":
+         [
+           {
+             "objectClassName": "entity",
+             "handle": "YYYY-RIR",
+             "roles": [ "administrative", ... ]
+             "links":
+             [
+               {
+                 "value": "https://example.net/ip/2001:db8::/48",
+                 "rel": "self",
+                 "href": "https://example.net/entity/YYYY-RIR",
+                 "type": "application/rdap+json"
+               }
+             ],
+           },
+           ...
+         ],
+       },
+       ...
+       {
+         "objectClassName": "autnum",
+         "handle": "ZZZZ-RIR",
 
 
 
-                         Expires 24 October 2024                [Page 4]
+                         Expires 1 November 2024                [Page 4]
 
 Internet-Draft                  bulk-rdap                     April 2024
 
 
-          "type": "application/rdap+json"
-        },
-        ...
-      ],
-      ...
-      "entities":
-      [
-        {
-          "objectClassName": "entity",
-          "handle": "YYYY-RIR",
-          "roles": [ "administrative", ... ]
-          "links":
-          [
-            {
-              "value": "https://example.net/autnum/65537",
-              "rel": "self",
-              "href": "https://example.net/entity/YYYY-RIR",
-              "type": "application/rdap+json"
-            }
-          ],
-        },
-        ...
-      ],
-    },
-    ...
-  ]
-}
+         "links":
+         [
+           {
+             "value": "https://example.net/autnum/65537",
+             "rel": "self",
+             "href": "https://example.net/autnum/65537",
+             "type": "application/rdap+json"
+           },
+           ...
+         ],
+         ...
+         "entities":
+         [
+           {
+             "objectClassName": "entity",
+             "handle": "YYYY-RIR",
+             "roles": [ "administrative", ... ]
+             "links":
+             [
+               {
+                 "value": "https://example.net/autnum/65537",
+                 "rel": "self",
+                 "href": "https://example.net/entity/YYYY-RIR",
+                 "type": "application/rdap+json"
+               }
+             ],
+           },
+           ...
+         ],
+       },
+       ...
+     ]
+   }
 
 3.  Extension Identifier
 
@@ -260,36 +266,38 @@ Internet-Draft                  bulk-rdap                     April 2024
    included in the top-level "rdapConformance" member of the JSON object
    for bulk data, to signal adherence to this specification.
 
-   It is RECOMMENDED to also include the extension identifier for the
-   NRO RDAP Profile ("nro_rdap_profile_0") in the top-level
+   It is RECOMMENDED that the extension identifier for the NRO RDAP
+   Profile ("nro_rdap_profile_0") also be included in the top-level
    "rdapConformance" member.  But, when in conflict, the Bulk RDAP
    extension requirements SHOULD supersede the NRO RDAP Profile
    extension requirements, primarily to afford bulk data compactness.
 
 4.  Bulk Data URL
 
-   *  Scheme: HTTPS
-   *  Method: GET
-   *  Path Segment: nroBulkRdap1?objectClasses=<comma-separated string
-      of RDAP object class names>
-   *  Returns: Bulk data (see Section 2)
-   *  Content-Type: application/rdap+json
 
 
 
-                         Expires 24 October 2024                [Page 5]
+                         Expires 1 November 2024                [Page 5]
 
 Internet-Draft                  bulk-rdap                     April 2024
 
 
+   *  Scheme: HTTPS
+   *  Method: GET
+   *  Path Segment: nroBulkRdap1?objectClasses=<comma-separated string
+      of RDAP object class names>
+   *  Returns: Bulk data as either JSON data (Section 2) or JSON Web
+      Signature (JWS) string (Section 5)
+   *  Content-Type: application/rdap+json
+
    Using comma (',') to delimit multiple object class names for the
-   value of the "objectClasses" query parameter safely assumes that
-   there will be no commas in future RDAP object class names.
+   value of the "objectClasses" query parameter assumes that there will
+   be no comma in future RDAP object class names.
 
    Here is an example URL to get bulk data for IP Network, Autonomous
    System Number, and Entity object classes:
 
- https://example.net/nroBulkRdap1?objectClasses=ip network,autnum,entity
+https://example.net/nroBulkRdap1?objectClasses=ip%20network,autnum,entity
 
    For a 200 OK response (Section 15.3.1 of [RFC9110]), the server MUST
    return a JSON object with its "objects" member filled with all the
@@ -308,35 +316,35 @@ Internet-Draft                  bulk-rdap                     April 2024
 
 5.  Security Considerations
 
-   It is RECOMMENDED to use JSON Web Signature (JWS) [RFC7515] / JSON
-   Web Key (JWK) [RFC7517] to sign and validate JSON data.  It is
-   further RECOMMENDED that Elliptic Curve Digital Signature Algorithm
-   (ECDSA) (Section 3.4 of [RFC7518]) be used for JWS.
+   It is RECOMMENDED that JSON Web Signature (JWS) [RFC7515] and JSON
+   Web Key (JWK) [RFC7517] be used to sign and validate JSON data for
+   Bulk RDAP.  It is further RECOMMENDED that Elliptic Curve Digital
+   Signature Algorithm (ECDSA) (Section 3.4 of [RFC7518]) be used for
+   JWS.
 
    When JWS and JWK are used to sign JSON data, the JWS string is
    returned in the HTTP response for the bulk data call.  The client
    first verifies the JWS string and then decodes the Base64URL-encoded
    payload for JSON data.
 
-   Furthermore, it is RECOMMENDED to follow the guidance from Section 3
-   of [RFC7481] to secure the bulk data URL for encryption,
+   Furthermore, it is RECOMMENDED that the guidance from Section 3 of
+   [RFC7481] be followed to secure the bulk data URL for encryption,
    authentication, and authorization.
+
+
+
+                         Expires 1 November 2024                [Page 6]
+
+Internet-Draft                  bulk-rdap                     April 2024
+
 
 6.  Operational Considerations
 
    It is NOT RECOMMENDED to make the RDAP bulk data available over FTP
-   ([RFC959]).  Compared to HTTPS, FTP is considered more complex to
-   operate, less secure, and less firewall-friendly.
+   ([RFC959]).  Compared to HTTPS, FTP is generally considered more
+   complex to operate, less secure, and less firewall-friendly.
 
 7.  IANA Considerations
-
-
-
-
-                         Expires 24 October 2024                [Page 6]
-
-Internet-Draft                  bulk-rdap                     April 2024
-
 
 7.1.  RDAP Extensions Registry
 
@@ -378,6 +386,14 @@ Internet-Draft                  bulk-rdap                     April 2024
               RFC 7481, DOI 10.17487/RFC7481, March 2015,
               <https://www.rfc-editor.org/info/rfc7481>.
 
+
+
+
+                         Expires 1 November 2024                [Page 7]
+
+Internet-Draft                  bulk-rdap                     April 2024
+
+
    [RFC7515]  Jones, M., Bradley, J., and N. Sakimura, "JSON Web
               Signature (JWS)", RFC 7515, DOI 10.17487/RFC7515, May
               2015, <https://www.rfc-editor.org/info/rfc7515>.
@@ -385,14 +401,6 @@ Internet-Draft                  bulk-rdap                     April 2024
    [RFC7517]  Jones, M., "JSON Web Key (JWK)", RFC 7517,
               DOI 10.17487/RFC7517, May 2015,
               <https://www.rfc-editor.org/info/rfc7517>.
-
-
-
-
-                         Expires 24 October 2024                [Page 7]
-
-Internet-Draft                  bulk-rdap                     April 2024
-
 
    [RFC7518]  Jones, M., "JSON Web Algorithms (JWA)", RFC 7518,
               DOI 10.17487/RFC7518, May 2015,
@@ -428,27 +436,27 @@ Internet-Draft                  bulk-rdap                     April 2024
 Appendix A.  Other Potential Use Cases
 
    Though this specification is intended to provide access to bulk data
-   from the RIRs through RDAP, it MAY also be used for the following
+   from the RIRs through RDAP, it may also be used for the following
    potential use cases:
 
-   *  Escrow: Although there is presently no formal requirement for the
-      RIRs to escrow their registration data, the JSON data format
-      described here could be used for that purpose in the future.
-   *  Data ingestion for RDAP server: The RIR customers are typically
-      required to report back on the utilization of their registered IP
-      addresses and autonomous system numbers to the RIR.  The customer
-      could locally run an RDAP server and upload the utilization info
-      for its number resources in the form of RDAP objects.  The JSON
-      data format described here could be used for ingesting such data
-      onto their local RDAP server.
+   *  Escrow: Although there is presently no requirement for the RIRs to
+      escrow their registration data, the JSON data format described
+      here could be used for that purpose in the future.
 
 
 
-
-                         Expires 24 October 2024                [Page 8]
+                         Expires 1 November 2024                [Page 8]
 
 Internet-Draft                  bulk-rdap                     April 2024
 
+
+   *  Resource utilization data upload to an RDAP server: The RIR
+      customers are typically required to report back on the utilization
+      of their allocated IP addresses and autonomous system numbers to
+      the RIR.  A customer could locally run an RDAP server and upload
+      the utilization data for its number resources in the form of RDAP
+      objects.  The JSON data format described here could be used for
+      periodically uploading such data to a local RDAP server.
 
 Author's Address
 
@@ -493,12 +501,4 @@ Author's Address
 
 
 
-
-
-
-
-
-
-
-
-                         Expires 24 October 2024                [Page 9]
+                         Expires 1 November 2024                [Page 9]
