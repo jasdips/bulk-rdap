@@ -8,7 +8,7 @@ name = "Internet-Draft"
 value = "draft-nro-bulk-rdap-00"
 stream = "IETF"
 status = "standard"
-date = 2024-04-22T00:00:00Z
+date = 2024-04-29T00:00:00Z
 
 [[author]]
 organization="Number Resource Organization"
