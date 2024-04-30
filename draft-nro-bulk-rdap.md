@@ -168,6 +168,7 @@ Here is an elided example of a JSON object containing bulk data for the IP Netwo
   ]
 }
 ```
+_Figure 1_
 
 # Extension Identifier
 
@@ -192,6 +193,7 @@ Here is an example URL to get bulk data for the IP Network object class:
 ```
 https://example.net/nroBulkRdap1?objectClass=ip%20network
 ```
+_Figure 2_
 
 For a 200 OK response ([@!RFC9110, section 15.3.1]), the server MUST return a JSON object with its "objects" member
 filled with all the objects for the RDAP object class listed in the "objectClass" query parameter.
