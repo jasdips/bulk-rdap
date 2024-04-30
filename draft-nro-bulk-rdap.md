@@ -178,7 +178,8 @@ RDAP Profile extension requirements, primarily to afford bulk data compactness.
 * Scheme: HTTPS
 * Method: GET
 * Path Segment: nroBulkRdap1?objectClasses=<comma-separated string of RDAP object class names>
-* Returns: Bulk data (see (#data_format))
+* Returns: Bulk data (see (#data_format)), as either JSON data or JSON Web Signature (JWS) string (see
+  (#security_considerations))
 * Content-Type: application/rdap+json
 
 Using comma (',') to delimit multiple object class names for the value of the "objectClasses" query parameter assumes
@@ -200,7 +201,7 @@ return a 501 Not Implemented response ([@!RFC9110, section 15.6.2]).
 If one or more of the RDAP object classes listed in the "objectClasses" query parameter are invalid, the server SHOULD
 return a 400 Bad Request response ([@!RFC9110, section 15.5.1]).
 
-# Security Considerations
+# Security Considerations {#security_considerations}
 
 It is RECOMMENDED that JSON Web Signature (JWS) [@!RFC7515] and JSON Web Key (JWK) [@!RFC7517] be used to sign and
 validate JSON data for Bulk RDAP. It is further RECOMMENDED that Elliptic Curve Digital Signature Algorithm (ECDSA)
