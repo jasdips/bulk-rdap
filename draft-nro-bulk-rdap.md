@@ -178,8 +178,8 @@ RDAP Profile extension requirements, primarily to afford bulk data compactness.
 * Scheme: HTTPS
 * Method: GET
 * Path Segment: nroBulkRdap1?objectClasses=<comma-separated string of RDAP object class names>
-* Returns: Bulk data (see (#data_format)), as either JSON data or JSON Web Signature (JWS) string (see
-  (#security_considerations))
+* Returns: Bulk data as either JSON data ((#data_format)) or JSON Web Signature (JWS) string
+  ((#security_considerations))
 * Content-Type: application/rdap+json
 
 Using comma (',') to delimit multiple object class names for the value of the "objectClasses" query parameter assumes
