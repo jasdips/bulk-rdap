@@ -8,7 +8,7 @@ name = "Internet-Draft"
 value = "draft-nro-bulk-rdap-00"
 stream = "IETF"
 status = "standard"
-date = 2024-04-29T00:00:00Z
+date = 2024-04-30T00:00:00Z
 
 [[author]]
 organization="Number Resource Organization"
@@ -48,7 +48,7 @@ feature of this service.
 
 # Data Format {#data_format}
 
-The Bulk RDAP data is a JSON object comprising JSON members for metadata and JSON data for RDAP object classes.
+The Bulk RDAP data is a JSON object comprising JSON members for metadata and JSON data for an RDAP object class.
 
 ## Metadata
 
@@ -61,9 +61,9 @@ The following JSON members for metadata MUST be included:
 
 ## Data For Object Classes
 
-The JSON data for RDAP object classes is an "objects" member -- a JSON array comprising all the objects for one or more
-RDAP object classes. It is RECOMMENDED that an RIR provide bulk data for IP Network, Autonomous System Number, Domain,
-Nameserver, and Entity object classes ([@!RFC9083, section 5]).
+The JSON data for an RDAP object class is an "objects" member -- a JSON array comprising all the objects for that class.
+It is RECOMMENDED that an RIR provide bulk data for IP Network, Autonomous System Number, Domain, Nameserver, and Entity
+object classes ([@!RFC9083, section 5]).
 
 Furthermore, within the JSON array:
 
@@ -77,8 +77,7 @@ Furthermore, within the JSON array:
 
 ## Example
 
-Here is an elided example of a JSON object containing bulk data for both IP Network and Autonomous System Number object
-classes:
+Here is an elided example of a JSON object containing bulk data for the IP Network object class:
 
 ```
 {
@@ -95,6 +94,10 @@ classes:
     {
       "objectClassName": "ip network",
       "handle": "XXXX-RIR",
+      "startAddress": "2001:db8::",
+      "endAddress": "2001:db8:0:ffff:ffff:ffff:ffff:ffff",
+      "ipVersion": "v6",
+      ...
       "links":
       [
         {
@@ -105,19 +108,18 @@ classes:
         },
         ...
       ],
-      ...
       "entities":
       [
         {
           "objectClassName": "entity",
-          "handle": "YYYY-RIR",
+          "handle": "AAAA-RIR",
           "roles": [ "administrative", ... ]
           "links":
           [
             {
               "value": "https://example.net/ip/2001:db8::/48",
               "rel": "self",
-              "href": "https://example.net/entity/YYYY-RIR",
+              "href": "https://example.net/entity/AAAA-RIR",
               "type": "application/rdap+json"
             }
           ],
@@ -125,33 +127,35 @@ classes:
         ...
       ],
     },
-    ...
     {
-      "objectClassName": "autnum",
-      "handle": "ZZZZ-RIR",
+      "objectClassName": "ip network",
+      "handle": "YYYY-RIR",
+      "startAddress": "2001:db8:1::",
+      "endAddress": "2001:db8:1:ffff:ffff:ffff:ffff:ffff",
+      "ipVersion": "v6",
+      ...
       "links":
       [
         {
-          "value": "https://example.net/autnum/65537",
+          "value": "https://example.net/ip/2001:db8:1::/48",
           "rel": "self",
-          "href": "https://example.net/autnum/65537",
+          "href": "https://example.net/ip/2001:db8:1::/48",
           "type": "application/rdap+json"
         },
         ...
       ],
-      ...
       "entities":
       [
         {
           "objectClassName": "entity",
-          "handle": "YYYY-RIR",
-          "roles": [ "administrative", ... ]
+          "handle": "BBBB-RIR",
+          "roles": [ "technical", ... ]
           "links":
           [
             {
-              "value": "https://example.net/autnum/65537",
+              "value": "https://example.net/ip/2001:db8:1::/48",
               "rel": "self",
-              "href": "https://example.net/entity/YYYY-RIR",
+              "href": "https://example.net/entity/BBBB-RIR",
               "type": "application/rdap+json"
             }
           ],
@@ -177,29 +181,26 @@ RDAP Profile extension requirements, primarily to afford bulk data compactness.
 
 * Scheme: HTTPS
 * Method: GET
-* Path Segment: nroBulkRdap1?objectClasses=<comma-separated string of RDAP object class names>
+* Path Segment: nroBulkRdap1?objectClass=<RDAP object class name>
 * Returns: Bulk data as either JSON data ((#data_format)) or JSON Web Signature (JWS) string
   ((#security_considerations))
 * Content-Type: application/rdap+json
 
-Using comma (',') to delimit multiple object class names for the value of the "objectClasses" query parameter assumes
-that there will be no comma in future RDAP object class names.
-
-Here is an example URL to get bulk data for IP Network, Autonomous System Number, and Entity object classes:
+Here is an example URL to get bulk data for the IP Network object class:
 
 ```
-https://example.net/nroBulkRdap1?objectClasses=ip%20network,autnum,entity
+https://example.net/nroBulkRdap1?objectClass=ip%20network
 ```
 
 For a 200 OK response ([@!RFC9110, section 15.3.1]), the server MUST return a JSON object with its "objects" member
-filled with all the objects for the RDAP object classes listed in the "objectClasses" query parameter.
+filled with all the objects for the RDAP object class listed in the "objectClass" query parameter.
 
-If the RDAP object classes listed in the "objectClasses" query parameter are all valid ([@!RFC9083, section 5], or a
-future RDAP object class) but the bulk data functionality has not been implemented for some of them, the server SHOULD
-return a 501 Not Implemented response ([@!RFC9110, section 15.6.2]).
+If the RDAP object class listed in the "objectClass" query parameter is valid ([@!RFC9083, section 5], or a future RDAP
+object class) but the bulk data functionality has not been implemented for it, the server SHOULD return a 501 Not
+Implemented response ([@!RFC9110, section 15.6.2]).
 
-If one or more of the RDAP object classes listed in the "objectClasses" query parameter are invalid, the server SHOULD
-return a 400 Bad Request response ([@!RFC9110, section 15.5.1]).
+If the RDAP object class listed in the "objectClass" query parameter is invalid, the server SHOULD return a 400 Bad
+Request response ([@!RFC9110, section 15.5.1]).
 
 # Security Considerations {#security_considerations}
 
