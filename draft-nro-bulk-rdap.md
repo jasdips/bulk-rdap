@@ -20,17 +20,17 @@ email = "secretariat@nro.net"
 .# Abstract
 
 To complement the move from Whois to RDAP for the RIRs (Regional Internet Registries), this document specifies a new
-service, named Bulk RDAP, that an RIR can deploy in lieu of their Bulk Whois service.
+service named the Bulk RDAP that an RIR can deploy to replace their Bulk Whois service.
 
 {mainmatter}
 
 # Introduction
 
 As the RIRs shift from Whois to RDAP, they also need an RDAP replacement for their Bulk Whois service. To that end, this
-document specifies a new service, named Bulk RDAP, that an RIR can deploy in lieu of Bulk Whois. This service is
-intended to be a simple, easy-to-implement replacement for Bulk Whois.
+document specifies a new service named the Bulk RDAP that an RIR can deploy in lieu of the Bulk Whois. This service is
+intended to be a simple, easy-to-implement replacement for the Bulk Whois.
 
-At a higher level, Bulk RDAP comprises JSON data for IP Network, Autonomous System Number, Domain, Nameserver, and
+At a higher level, the Bulk RDAP comprises JSON data for IP Network, Autonomous System Number, Domain, Nameserver, and
 Entity object classes ([@!RFC9083, section 5]), plus some JSON metadata. It can be easily extended to include data for
 any future RDAP object class. Furthermore, it is an HTTPS-based service that the RIR customers could use to securely get
 this data.
@@ -48,7 +48,8 @@ feature of this service.
 
 # Data Format {#data_format}
 
-The Bulk RDAP data is a JSON object comprising JSON members for metadata and JSON data for an RDAP object class.
+The data returned for a Bulk RDAP request ((#bulk_rdap_url)) is a JSON object comprising JSON members for metadata and
+JSON data for a single RDAP object class.
 
 ## Metadata
 
@@ -68,7 +69,7 @@ object classes ([@!RFC9083, section 5]).
 Furthermore, within the JSON array:
 
 * The "self" links for each primary object and the secondary objects it contains MUST be included to have parity with
-  the "ref" element in Bulk Whois.
+  the "ref" element in the Bulk Whois.
 * For compactness, it is NOT RECOMMENDED to include details for a secondary object beside its "self" link, "handle" when
   defined, and relationship to the primary object (e.g., using the "roles" member in an Entity object to relate to an IP
   Network object).
@@ -177,7 +178,7 @@ It is RECOMMENDED that the extension identifier for the NRO RDAP Profile ("nro_r
 top-level "rdapConformance" member. But, when in conflict, the Bulk RDAP extension requirements SHOULD supersede the NRO
 RDAP Profile extension requirements, primarily to afford bulk data compactness.
 
-# Bulk Data URL
+# Bulk RDAP URL {#bulk_rdap_url}
 
 * Scheme: HTTPS
 * Method: GET
@@ -205,13 +206,13 @@ Request response ([@!RFC9110, section 15.5.1]).
 # Security Considerations {#security_considerations}
 
 It is RECOMMENDED that JSON Web Signature (JWS) [@!RFC7515] and JSON Web Key (JWK) [@!RFC7517] be used to sign and
-validate JSON data for Bulk RDAP. It is further RECOMMENDED that Elliptic Curve Digital Signature Algorithm (ECDSA)
+validate JSON data for the Bulk RDAP. It is further RECOMMENDED that Elliptic Curve Digital Signature Algorithm (ECDSA)
 ([@!RFC7518, section 3.4]) be used for JWS.
 
-When JWS and JWK are used to sign JSON data, the JWS string is returned in the HTTP response for the bulk data call. The
-client first verifies the JWS string and then decodes the Base64URL-encoded payload for JSON data.
+When JWS and JWK are used to sign JSON data, the JWS string is returned in the HTTP response for the Bulk RDAP request.
+The client first verifies the JWS string and then decodes the Base64URL-encoded payload for JSON data.
 
-Furthermore, it is RECOMMENDED that the guidance from [@!RFC7481, section 3] be followed to secure the bulk data URL for
+Furthermore, it is RECOMMENDED that the guidance from [@!RFC7481, section 3] be followed to secure the Bulk RDAP URL for
 encryption, authentication, and authorization.
 
 # Operational Considerations
