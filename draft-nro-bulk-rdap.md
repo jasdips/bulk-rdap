@@ -61,9 +61,9 @@ The following JSON members for metadata MUST be included:
 
 ## Data For Object Classes
 
-The JSON data for RDAP object classes is an "objects" member that is a JSON array comprising all the objects for one or
-more RDAP object classes. It is RECOMMENDED that an RIR provides bulk data for IP Network, Autonomous System Number,
-Domain, Nameserver, and Entity object classes ([@!RFC9083, section 5]).
+The JSON data for RDAP object classes is an "objects" member -- a JSON array comprising all the objects for one or more
+RDAP object classes. It is RECOMMENDED that an RIR provide bulk data for IP Network, Autonomous System Number, Domain,
+Nameserver, and Entity object classes ([@!RFC9083, section 5]).
 
 Furthermore, within the JSON array:
 
@@ -75,12 +75,20 @@ Furthermore, within the JSON array:
 * An "rdapConformance" member MAY be included at the top of a primary object if the RDAP extensions used to produce it
   are different from those listed in the "rdapConformance" member for metadata.
 
+## Example
+
 Here is an elided example of a JSON object containing bulk data for both IP Network and Autonomous System Number object
 classes:
 
 ```
 {
-  "rdapConformance": [ "rdap_level_0", "nro_rdap_profile_0", "nroBulkRdap1", ... ],
+  "rdapConformance":
+  [
+    "rdap_level_0",
+    "nro_rdap_profile_0",
+    "nroBulkRdap1",
+    ...
+  ],
   "serial": "12345",
   "objects":
   [
@@ -161,7 +169,7 @@ classes:
 The "nroBulkRdap1" extension identifier (see (#rdap_extensions_registry)) MUST be included in the top-level
 "rdapConformance" member of the JSON object for bulk data, to signal adherence to this specification.
 
-It is RECOMMENDED to also include the extension identifier for the NRO RDAP Profile ("nro_rdap_profile_0") in the
+It is RECOMMENDED that the extension identifier for the NRO RDAP Profile ("nro_rdap_profile_0") also be included in the
 top-level "rdapConformance" member. But, when in conflict, the Bulk RDAP extension requirements SHOULD supersede the NRO
 RDAP Profile extension requirements, primarily to afford bulk data compactness.
 
@@ -173,13 +181,13 @@ RDAP Profile extension requirements, primarily to afford bulk data compactness.
 * Returns: Bulk data (see (#data_format))
 * Content-Type: application/rdap+json
 
-Using comma (',') to delimit multiple object class names for the value of the "objectClasses" query parameter safely
-assumes that there will be no commas in future RDAP object class names.
+Using comma (',') to delimit multiple object class names for the value of the "objectClasses" query parameter assumes
+that there will be no comma in future RDAP object class names.
 
 Here is an example URL to get bulk data for IP Network, Autonomous System Number, and Entity object classes:
 
 ```
-https://example.net/nroBulkRdap1?objectClasses=ip network,autnum,entity
+https://example.net/nroBulkRdap1?objectClasses=ip%20network,autnum,entity
 ```
 
 For a 200 OK response ([@!RFC9110, section 15.3.1]), the server MUST return a JSON object with its "objects" member
@@ -194,20 +202,20 @@ return a 400 Bad Request response ([@!RFC9110, section 15.5.1]).
 
 # Security Considerations
 
-It is RECOMMENDED to use JSON Web Signature (JWS) [@!RFC7515] / JSON Web Key (JWK) [@!RFC7517] to sign and validate JSON
-data. It is further RECOMMENDED that Elliptic Curve Digital Signature Algorithm (ECDSA) ([@!RFC7518, section 3.4]) be
-used for JWS.
+It is RECOMMENDED that JSON Web Signature (JWS) [@!RFC7515] and JSON Web Key (JWK) [@!RFC7517] be used to sign and
+validate JSON data for Bulk RDAP. It is further RECOMMENDED that Elliptic Curve Digital Signature Algorithm (ECDSA)
+([@!RFC7518, section 3.4]) be used for JWS.
 
 When JWS and JWK are used to sign JSON data, the JWS string is returned in the HTTP response for the bulk data call. The
 client first verifies the JWS string and then decodes the Base64URL-encoded payload for JSON data.
 
-Furthermore, it is RECOMMENDED to follow the guidance from [@!RFC7481, section 3] to secure the bulk data URL for
+Furthermore, it is RECOMMENDED that the guidance from [@!RFC7481, section 3] be followed to secure the bulk data URL for
 encryption, authentication, and authorization.
 
 # Operational Considerations
 
-It is NOT RECOMMENDED to make the RDAP bulk data available over FTP ([@RFC959]). Compared to HTTPS, FTP is considered
-more complex to operate, less secure, and less firewall-friendly.
+It is NOT RECOMMENDED to make the RDAP bulk data available over FTP ([@RFC959]). Compared to HTTPS, FTP is generally
+considered more complex to operate, less secure, and less firewall-friendly.
 
 # IANA Considerations
 
