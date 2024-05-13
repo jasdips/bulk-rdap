@@ -5,10 +5,10 @@ ipr= "trust200902"
 
 [seriesInfo]
 name = "Internet-Draft"
-value = "draft-nro-bulk-rdap-00"
+value = "draft-nro-bulk-rdap-01"
 stream = "IETF"
 status = "standard"
-date = 2024-04-30T00:00:00Z
+date = 2024-05-13T00:00:00Z
 
 [[author]]
 organization="Number Resource Organization"
@@ -23,6 +23,21 @@ To complement the move from Whois to RDAP for the RIRs (Regional Internet Regist
 service named the Bulk RDAP that an RIR can deploy to replace their Bulk Whois service.
 
 {mainmatter}
+
+# TODOs
+
+* Metadata object followed by new-line separated RDAP objects to help with streaming
+* Metadata -- a UUID string as versionId (in lieu of serial), productionDate with UTC offset, producer, objectCount, and
+  rdapConformance with "nroBulkRdap1" extension id
+* Add URL to get objects of all types
+* Each RDAP object has its own rdapConformance member, listing all extensions used in its creation; a MUST
+* Limit nested objected to the first level only
+* Explain all possible content types, with the gzip recommended; create a table for readability
+* Get JWK out-of-band
+* Operational considerations -- daily, off-line generation with rationale (one-time JWS generation cost)
+* No need to mention FTP; make HTTPS a MUST
+* Make omission for nested objects a MUST
+* Replace "replacement" with "counterpart"?
 
 # Introduction
 
