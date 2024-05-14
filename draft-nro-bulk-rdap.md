@@ -29,13 +29,13 @@ service named the Bulk RDAP that an RIR can deploy to replace their Bulk Whois s
 * Metadata object followed by new-line separated RDAP objects to help with streaming
 * Metadata -- a UUID string as versionId (in lieu of serial), productionDate with UTC offset, producer, objectCount, and
   rdapConformance with "nroBulkRdap1" extension id - DONE
-* Add URL to get objects of all types
+* Add URL to get objects of all types  - DONE
 * Each RDAP object has its own rdapConformance member, listing all extensions used in its creation; a MUST - DONE
 * Limit nested objected to the first level only - DONE
-* Explain all possible content types, with the gzip recommended; create a table for readability
-* Get JWK out-of-band
-* Operational considerations -- daily, off-line generation with rationale (one-time JWS generation cost)
-* No need to mention FTP; make HTTPS a MUST
+* Explain all possible content types, with the gzip recommended; create a table for readability - DONE
+* Get JWK out-of-band - DONE
+* Operational considerations -- daily, off-line generation with rationale (one-time JWS generation cost) - DONE
+* No need to mention FTP; make HTTPS a MUST - DONE
 * Make omission for nested objects a MUST - DONE
 * Replace "replacement" with "counterpart"?
 
@@ -251,16 +251,15 @@ It is RECOMMENDED that JSON Web Signature (JWS) [@!RFC7515] and JSON Web Key (JW
 validate JSON data for the Bulk RDAP. It is further RECOMMENDED that Elliptic Curve Digital Signature Algorithm (ECDSA)
 ([@!RFC7518, section 3.4]) be used for JWS.
 
-When the server uses JWS and JWK to sign JSON data, a JWS string is returned in the HTTP response for a Bulk RDAP
-request. The client then verifies the JWS string before decoding the Base64URL-encoded payload for JSON data.
-
 Furthermore, it is RECOMMENDED that the guidance from [@!RFC7481, section 3] be followed to secure the Bulk RDAP URL for
 encryption, authentication, and authorization.
 
 # Operational Considerations
 
-It is NOT RECOMMENDED to make the RDAP bulk data available over FTP ([@RFC959]). Compared to HTTPS, FTP is generally
-considered more complex to operate, less secure, and less firewall-friendly.
+If a server uses the JWS to secure bulk data, the related JWK is expected to be distributed out-of-band to the clients.
+
+Since bulk data generation and optionally signing it are considered computationally expensive, it is RECOMMENDED that
+these operations be performed off-line and once a day.
 
 # IANA Considerations
 
@@ -278,8 +277,10 @@ https://www.iana.org/assignments/rdap-extensions/:
 
 # Acknowledgements
 
-This work is influenced by the earlier RDAP Mirroring Protocol proposal ([@?I-D.harrison-regext-rdap-mirroring]),
-especially for the serial number and JSON Web Signature ideas.
+The JSON Web Signature idea is borrowed from the RDAP Mirroring Protocol proposal
+([@?I-D.harrison-regext-rdap-mirroring]). In the metadata object, using a UUID for the "versionId" field is influenced
+by the RPKI Repository Delta Protocol (RRDP, [@RFC8182]), and the "producer" and "productionDate" fields by the NRO
+Transfer Log Format.
 
 {backmatter}
 
