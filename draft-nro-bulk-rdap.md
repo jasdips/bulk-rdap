@@ -19,7 +19,7 @@ email = "secretariat@nro.net"
 
 .# Abstract
 
-To complement the move from Whois to RDAP for the RIRs (Regional Internet Registries), this document specifies a new
+To complement the move from Whois to RDAP for the Regional Internet Registries (RIRs), this document specifies a new
 service, named the Bulk RDAP, that an RIR can deploy in lieu of its Bulk Whois service.
 
 {mainmatter}
@@ -33,7 +33,7 @@ intended to be a simple, easy-to-implement replacement.
 At a higher level, the Bulk RDAP comprises JSON data for IP Network, Autonomous System Number, Domain, Nameserver, and
 Entity object classes ([@!RFC9083, section 5]), plus some JSON metadata. It can be easily extended to include data for
 any future RDAP object class. Furthermore, it is an HTTPS-based service that the RIR customers can use to securely get
-this data.
+this bulk data.
 
 ## Requirements Language
 
@@ -49,7 +49,7 @@ feature of this service.
 # Bulk Data Format {#bulk_data_format}
 
 The data returned for a Bulk RDAP request ((#bulk_rdap_url)) is a JSON object providing metadata information, followed
-by newline-separated data objects for one or more RDAP object classes.
+by newline-separated data objects for one or more RDAP object classes ([@!RFC9083, section 5]).
 
 ## Metadata
 
@@ -57,13 +57,13 @@ The JSON metadata object MUST include the following members:
 
 * "extensionId" -- the "nroBulkRdap1" string (see (#rdap_extensions_registry))
 * "versionId" -- a version 4 Universally Unique IDentifier (UUID, [@!RFC9562, section 5.4]) string that MUST be the same
-  for all the bulk data generated for various RDAP object classes at a particular interval (say, once a day)
+  for all the bulk data generated for various RDAP object classes at a particular interval (say, on a particular day)
 * "producer" -- a string identifying the registry that produced the bulk data, with possible values of "AFRINIC",
   "APNIC", "ARIN", "LACNIC", "RIPE NCC", or an agreed-upon string literal for a registry at the national or local level
-* "productionDate" -- a string containing the date and time with the UTC offset of the producer, indicating when the
-  bulk data being returned was produced
-* "objectCount" -- a positive number representing the count of newline-separated data objects following the metadata
-  object, to help clients detect a partial response for a bulk data request
+* "productionDate" -- a string containing the date and time with the UTC offset ([@!RFC3339]) of the producer,
+  indicating when the bulk data being returned was produced
+* "objectCount" -- a positive number (greater than 0) representing the count of newline-separated data objects following
+  the metadata object, to help clients detect a partial response for a bulk data request
 
 ## Data
 
@@ -74,15 +74,16 @@ class, each returned object has the following characteristics:
 * An "rdapConformance" member ([@!RFC9083, section 4.1]) MUST be included to indicate the RDAP extensions used for
   constructing the object.
 * The "self" links ([@!RFC9083, section 4.2]) for the object and its first-level nested objects MUST be included. For
-  example, include the "self" links for an entity object and its IP network and autonomous system number objects but not
-  for the entities within those IP network and autonomous system number objects.
+  example, include the "self" links for an entity object (representing an organization) and its IP network and
+  autonomous system number objects but not for the entities within those IP network and autonomous system number
+  objects.
 * For compactness, a first-level nested object MUST NOT include any other data beside its "self" link, "handle"
   (representing a registry-unique identifier for the object) if defined, and relationship to the containing object
   (e.g., using the "roles" member in a nested entity object to relate to its containing IP network object).
 
-## Example
+## Sample Bulk Data
 
-Here is an elided example of a bulk data response for the IP Network object class:
+Here is an elided example of the bulk data generated on a particular day for the IP Network object class:
 
 ```
 {
@@ -93,13 +94,7 @@ Here is an elided example of a bulk data response for the IP Network object clas
   "objectCount": 500000
 }
 {
-  "rdapConformance":
-  [
-    "rdap_level_0",
-    "nro_rdap_profile_0",
-    "nroBulkRdap1",
-    ...
-  ],
+  "rdapConformance": [ "rdap_level_0", "nro_rdap_profile_0", "nroBulkRdap1", ... ],
   "objectClassName": "ip network",
   "handle": "XXXX-ARIN",
   "startAddress": "2001:db8::",
@@ -136,13 +131,7 @@ Here is an elided example of a bulk data response for the IP Network object clas
   ]
 }
 {
-  "rdapConformance":
-  [
-    "rdap_level_0",
-    "nro_rdap_profile_0",
-    "nroBulkRdap1",
-    ...
-  ],
+  "rdapConformance": [ "rdap_level_0", "nro_rdap_profile_0", "nroBulkRdap1", ... ],
   "objectClassName": "ip network",
   "handle": "YYYY-ARIN",
   "startAddress": "2001:db8:1::",
@@ -169,6 +158,93 @@ Here is an elided example of a bulk data response for the IP Network object clas
       [
         {
           "value": "https://example.net/ip/2001:db8:1::/48",
+          "rel": "self",
+          "href": "https://example.net/entity/BBBB-ARIN",
+          "type": "application/rdap+json"
+        }
+      ],
+    },
+    ...
+  ]
+}
+...
+```
+
+Here is an elided example of the bulk data generated on the same day for all the RDAP object classes an RIR supports:
+
+```
+{
+  "extensionId": "nroBulkRdap1",
+  "versionId": "3f8183db-1de6-4304-a0b3-e8df6c7ff1f2",
+  "producer": "ARIN",
+  "productionDate": "2024-05-14T04:30:00-04:00"
+  "objectCount": 750000
+}
+{
+  "rdapConformance": [ "rdap_level_0", "nro_rdap_profile_0", "nroBulkRdap1", ... ],
+  "objectClassName": "ip network",
+  "handle": "XXXX-ARIN",
+  "startAddress": "2001:db8::",
+  "endAddress": "2001:db8:0:ffff:ffff:ffff:ffff:ffff",
+  "ipVersion": "v6",
+  ...
+  "links":
+  [
+    {
+      "value": "https://example.net/ip/2001:db8::/48",
+      "rel": "self",
+      "href": "https://example.net/ip/2001:db8::/48",
+      "type": "application/rdap+json"
+    },
+    ...
+  ],
+  "entities":
+  [
+    {
+      "objectClassName": "entity",
+      "handle": "AAAA-ARIN",
+      "roles": [ "administrative", ... ]
+      "links":
+      [
+        {
+          "value": "https://example.net/ip/2001:db8::/48",
+          "rel": "self",
+          "href": "https://example.net/entity/AAAA-ARIN",
+          "type": "application/rdap+json"
+        }
+      ],
+    },
+    ...
+  ]
+}
+...
+{
+  "rdapConformance": [ "rdap_level_0", "nro_rdap_profile_0", "nroBulkRdap1", ... ],
+  "objectClassName": "autnum",
+  "handle": "ZZZZ-ARIN",
+  "startAutnum": 65536,
+  "endAutnum": 65541,
+  ...
+  "links":
+  [
+    {
+      "value": "https://example.net/autnum/65536",
+      "rel": "self",
+      "href": "https://example.net/autnum/65536",
+      "type": "application/rdap+json"
+    },
+    ...
+  ],
+  "entities":
+  [
+    {
+      "objectClassName": "entity",
+      "handle": "BBBB-ARIN",
+      "roles": [ "technical", ... ]
+      "links":
+      [
+        {
+          "value": "https://example.net/autnum/65536",
           "rel": "self",
           "href": "https://example.net/entity/BBBB-ARIN",
           "type": "application/rdap+json"
