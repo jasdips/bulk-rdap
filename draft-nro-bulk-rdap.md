@@ -30,13 +30,13 @@ service named the Bulk RDAP that an RIR can deploy to replace their Bulk Whois s
 * Metadata -- a UUID string as versionId (in lieu of serial), productionDate with UTC offset, producer, objectCount, and
   rdapConformance with "nroBulkRdap1" extension id - DONE
 * Add URL to get objects of all types
-* Each RDAP object has its own rdapConformance member, listing all extensions used in its creation; a MUST
-* Limit nested objected to the first level only
+* Each RDAP object has its own rdapConformance member, listing all extensions used in its creation; a MUST - DONE
+* Limit nested objected to the first level only - DONE
 * Explain all possible content types, with the gzip recommended; create a table for readability
 * Get JWK out-of-band
 * Operational considerations -- daily, off-line generation with rationale (one-time JWS generation cost)
 * No need to mention FTP; make HTTPS a MUST
-* Make omission for nested objects a MUST
+* Make omission for nested objects a MUST - DONE
 * Replace "replacement" with "counterpart"?
 
 # Introduction
@@ -104,6 +104,13 @@ Here is an elided example of a bulk data response for the IP Network object clas
   "objectCount": 500000
 }
 {
+  "rdapConformance":
+  [
+    "rdap_level_0",
+    "nro_rdap_profile_0",
+    "nroBulkRdap1",
+    ...
+  ],
   "objectClassName": "ip network",
   "handle": "XXXX-ARIN",
   "startAddress": "2001:db8::",
@@ -137,9 +144,16 @@ Here is an elided example of a bulk data response for the IP Network object clas
       ],
     },
     ...
-  ],
+  ]
 }
 {
+  "rdapConformance":
+  [
+    "rdap_level_0",
+    "nro_rdap_profile_0",
+    "nroBulkRdap1",
+    ...
+  ],
   "objectClassName": "ip network",
   "handle": "YYYY-ARIN",
   "startAddress": "2001:db8:1::",
@@ -173,7 +187,7 @@ Here is an elided example of a bulk data response for the IP Network object clas
       ],
     },
     ...
-  ],
+  ]
 }
 ...
 ```
@@ -182,12 +196,13 @@ _Figure 1_
 
 # Extension Identifier
 
-The "nroBulkRdap1" extension identifier (see (#rdap_extensions_registry)) MUST be included in the top-level
-"rdapConformance" member of the JSON object for bulk data, to signal adherence to this specification.
+The "nroBulkRdap1" extension identifier (see (#rdap_extensions_registry)) MUST be included as the value for the
+"extensionId" member in the metadata object of a bulk data response.
 
-It is RECOMMENDED that the extension identifier for the NRO RDAP Profile ("nro_rdap_profile_0") also be included in the
-top-level "rdapConformance" member. But, when in conflict, the Bulk RDAP extension requirements SHOULD supersede the NRO
-RDAP Profile extension requirements, primarily to afford bulk data compactness.
+The "rdapConformance" array for each returned data object MUST include both the "nroBulkRdap1" extension identifier and
+the extension identifier for the NRO RDAP Profile ("nro_rdap_profile_0" as of this writing). In the data objects, the
+Bulk RDAP extension requirements MUST supersede the NRO RDAP Profile extension requirements, primarily to afford bulk
+data compactness.
 
 # Bulk RDAP URL {#bulk_rdap_url}
 
