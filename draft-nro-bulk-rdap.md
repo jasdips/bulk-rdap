@@ -73,119 +73,109 @@ The following JSON members for metadata MUST be included:
 * "extensionId" -- the "nroBulkRdap1" string
 * "versionId" -- a version 4 Universally Unique IDentifier (UUID, [@!RFC9562, section 5.4]) string that MUST be the same
   for all the bulk data generated for various RDAP object classes at a particular interval (say, on a daily basis)
-* "utcOffset" -- a number between -12 and 12 that represents the UTC offset of the producer
 * "producer" -- a string identifying the registry that produced the bulk data, with possible values of "AFRINIC",
   "APNIC", "ARIN", "LACNIC", "RIPE NCC", or a string literal for a registry at the national or local level
-* "productionDate" -- a string containing the time and date the bulk data being returned was produced
+* "productionDate" -- a string containing the date and time with the UTC offset of the producer when the bulk data being
+  returned was produced
 * "objectCount" -- a number to indicate the number of newline-separated RDAP objects following the metadata object
 
-## Data for an Object Class
+## Data
 
-The JSON data for an RDAP object class is an "objects" member -- a JSON array comprising all the objects for that class.
-It is RECOMMENDED that an RIR provide bulk data for IP Network, Autonomous System Number, Domain, Nameserver, and Entity
-object classes ([@!RFC9083, section 5]).
+The metadata object is followed by newline-separated RDAP JSON objects for one or more RDAP object classes. Beside
+adhering to the object class definition per [@!RFC9083, section 5], or to the specification of a future RDAP object
+class, each returned object has the following characteristics:
 
-Furthermore, within the JSON array:
-
-* The "self" links for each primary object and the secondary objects it contains MUST be included to have parity with
-  the "ref" element in the Bulk Whois.
-* For compactness, it is NOT RECOMMENDED to include details for a secondary object beside its "self" link, "handle" when
-  defined, and relationship to the primary object (e.g., using the "roles" member in an Entity object to relate to an IP
-  Network object).
-* An "rdapConformance" member MAY be included at the top of a primary object if the RDAP extensions used to produce it
-  are different from those listed in the "rdapConformance" member for metadata.
+* An "rdapConformance" member MUST be included to signify the RDAP extensions used to construct the object.
+* The "self" links for the object, and for the nested objects it contains at the first level, MUST be included to have
+  parity with the "ref" element in the Bulk Whois.
+* For compactness, a nested object MUST NOT include any other data beside its "self" link, "handle" when defined, and
+  relationship to the object (e.g., using the "roles" member in an Entity object to relate to an IP Network object).
 
 ## Example
 
-Here is an elided example of a JSON object containing bulk data for the IP Network object class:
+Here is an elided example of a bulk data response for the IP Network object class:
 
 ```
 {
-  "rdapConformance":
-  [
-    "rdap_level_0",
-    "nro_rdap_profile_0",
-    "nroBulkRdap1",
-    ...
-  ],
-  "serial": "12345",
-  "objects":
+  "extensionId": "nroBulkRdap1",
+  "versionId": "3f8183db-1de6-4304-a0b3-e8df6c7ff1f2",
+  "producer": "ARIN",
+  "productionDate": "2024-05-14T04:00:00-04:00"
+  "objectCount": 500000
+}
+{
+  "objectClassName": "ip network",
+  "handle": "XXXX-ARIN",
+  "startAddress": "2001:db8::",
+  "endAddress": "2001:db8:0:ffff:ffff:ffff:ffff:ffff",
+  "ipVersion": "v6",
+  ...
+  "links":
   [
     {
-      "objectClassName": "ip network",
-      "handle": "XXXX-RIR",
-      "startAddress": "2001:db8::",
-      "endAddress": "2001:db8:0:ffff:ffff:ffff:ffff:ffff",
-      "ipVersion": "v6",
-      ...
+      "value": "https://example.net/ip/2001:db8::/48",
+      "rel": "self",
+      "href": "https://example.net/ip/2001:db8::/48",
+      "type": "application/rdap+json"
+    },
+    ...
+  ],
+  "entities":
+  [
+    {
+      "objectClassName": "entity",
+      "handle": "AAAA-ARIN",
+      "roles": [ "administrative", ... ]
       "links":
       [
         {
           "value": "https://example.net/ip/2001:db8::/48",
           "rel": "self",
-          "href": "https://example.net/ip/2001:db8::/48",
+          "href": "https://example.net/entity/AAAA-ARIN",
           "type": "application/rdap+json"
-        },
-        ...
-      ],
-      "entities":
-      [
-        {
-          "objectClassName": "entity",
-          "handle": "AAAA-RIR",
-          "roles": [ "administrative", ... ]
-          "links":
-          [
-            {
-              "value": "https://example.net/ip/2001:db8::/48",
-              "rel": "self",
-              "href": "https://example.net/entity/AAAA-RIR",
-              "type": "application/rdap+json"
-            }
-          ],
-        },
-        ...
+        }
       ],
     },
+    ...
+  ],
+}
+{
+  "objectClassName": "ip network",
+  "handle": "YYYY-ARIN",
+  "startAddress": "2001:db8:1::",
+  "endAddress": "2001:db8:1:ffff:ffff:ffff:ffff:ffff",
+  "ipVersion": "v6",
+  ...
+  "links":
+  [
     {
-      "objectClassName": "ip network",
-      "handle": "YYYY-RIR",
-      "startAddress": "2001:db8:1::",
-      "endAddress": "2001:db8:1:ffff:ffff:ffff:ffff:ffff",
-      "ipVersion": "v6",
-      ...
+      "value": "https://example.net/ip/2001:db8:1::/48",
+      "rel": "self",
+      "href": "https://example.net/ip/2001:db8:1::/48",
+      "type": "application/rdap+json"
+    },
+    ...
+  ],
+  "entities":
+  [
+    {
+      "objectClassName": "entity",
+      "handle": "BBBB-ARIN",
+      "roles": [ "technical", ... ]
       "links":
       [
         {
           "value": "https://example.net/ip/2001:db8:1::/48",
           "rel": "self",
-          "href": "https://example.net/ip/2001:db8:1::/48",
+          "href": "https://example.net/entity/BBBB-ARIN",
           "type": "application/rdap+json"
-        },
-        ...
-      ],
-      "entities":
-      [
-        {
-          "objectClassName": "entity",
-          "handle": "BBBB-RIR",
-          "roles": [ "technical", ... ]
-          "links":
-          [
-            {
-              "value": "https://example.net/ip/2001:db8:1::/48",
-              "rel": "self",
-              "href": "https://example.net/entity/BBBB-RIR",
-              "type": "application/rdap+json"
-            }
-          ],
-        },
-        ...
+        }
       ],
     },
     ...
-  ]
+  ],
 }
+...
 ```
 
 _Figure 1_
