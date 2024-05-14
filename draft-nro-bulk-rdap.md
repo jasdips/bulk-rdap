@@ -28,7 +28,7 @@ service named the Bulk RDAP that an RIR can deploy to replace their Bulk Whois s
 
 * Metadata object followed by new-line separated RDAP objects to help with streaming
 * Metadata -- a UUID string as versionId (in lieu of serial), productionDate with UTC offset, producer, objectCount, and
-  rdapConformance with "nroBulkRdap1" extension id
+  rdapConformance with "nroBulkRdap1" extension id - DONE
 * Add URL to get objects of all types
 * Each RDAP object has its own rdapConformance member, listing all extensions used in its creation; a MUST
 * Limit nested objected to the first level only
@@ -63,17 +63,21 @@ feature of this service.
 
 # Bulk Data Format {#bulk_data_format}
 
-The data returned for a Bulk RDAP request ((#bulk_rdap_url)) is a JSON object comprising JSON members for metadata and
-JSON data for a single RDAP object class.
+The data returned for a Bulk RDAP request ((#bulk_rdap_url)) is a JSON object providing metadata information, followed
+by newline-separated RDAP JSON objects for one or more RDAP object classes.
 
 ## Metadata
 
 The following JSON members for metadata MUST be included:
 
-* "rdapConformance" -- An array of strings ([@!RFC9083, section 4.1]) to signal the RDAP extensions the data is based
-  on.
-* "serial" -- An unsigned 32-bit number for sequencing the data snapshots. It is RECOMMENDED to follow the serial
-  number-wrapping arithmetic from [@!RFC1982].
+* "extensionId" -- the "nroBulkRdap1" string
+* "versionId" -- a version 4 Universally Unique IDentifier (UUID, [@!RFC9562, section 5.4]) string that MUST be the same
+  for all the bulk data generated for various RDAP object classes at a particular interval (say, on a daily basis)
+* "utcOffset" -- a number between -12 and 12 that represents the UTC offset of the producer
+* "producer" -- a string identifying the registry that produced the bulk data, with possible values of "AFRINIC",
+  "APNIC", "ARIN", "LACNIC", "RIPE NCC", or a string literal for a registry at the national or local level
+* "productionDate" -- a string containing the time and date the bulk data being returned was produced
+* "objectCount" -- a number to indicate the number of newline-separated RDAP objects following the metadata object
 
 ## Data for an Object Class
 
