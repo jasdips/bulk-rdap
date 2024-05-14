@@ -8,7 +8,7 @@ name = "Internet-Draft"
 value = "draft-nro-bulk-rdap-01"
 stream = "IETF"
 status = "standard"
-date = 2024-05-13T00:00:00Z
+date = 2024-05-14T00:00:00Z
 
 [[author]]
 organization="Number Resource Organization"
@@ -20,34 +20,19 @@ email = "secretariat@nro.net"
 .# Abstract
 
 To complement the move from Whois to RDAP for the RIRs (Regional Internet Registries), this document specifies a new
-service named the Bulk RDAP that an RIR can deploy to replace their Bulk Whois service.
+service, named the Bulk RDAP, that an RIR can deploy in lieu of its Bulk Whois service.
 
 {mainmatter}
 
-# TODOs
-
-* Metadata object followed by new-line separated RDAP objects to help with streaming
-* Metadata -- a UUID string as versionId (in lieu of serial), productionDate with UTC offset, producer, objectCount, and
-  rdapConformance with "nroBulkRdap1" extension id - DONE
-* Add URL to get objects of all types  - DONE
-* Each RDAP object has its own rdapConformance member, listing all extensions used in its creation; a MUST - DONE
-* Limit nested objected to the first level only - DONE
-* Explain all possible content types, with the gzip recommended; create a table for readability - DONE
-* Get JWK out-of-band - DONE
-* Operational considerations -- daily, off-line generation with rationale (one-time JWS generation cost) - DONE
-* No need to mention FTP; make HTTPS a MUST - DONE
-* Make omission for nested objects a MUST - DONE
-* Replace "replacement" with "counterpart"?
-
 # Introduction
 
-As the RIRs shift from Whois to RDAP, they also need an RDAP replacement for their Bulk Whois service. To that end, this
-document specifies a new service named the Bulk RDAP that an RIR can deploy in lieu of the Bulk Whois. This service is
-intended to be a simple, easy-to-implement replacement for the Bulk Whois.
+As the RIRs shift from Whois to RDAP, they also need an RDAP counterpart for their Bulk Whois service. To that end, this
+document specifies a new service, named the Bulk RDAP, that an RIR can deploy to replace the Bulk Whois. This service is
+intended to be a simple, easy-to-implement replacement.
 
 At a higher level, the Bulk RDAP comprises JSON data for IP Network, Autonomous System Number, Domain, Nameserver, and
 Entity object classes ([@!RFC9083, section 5]), plus some JSON metadata. It can be easily extended to include data for
-any future RDAP object class. Furthermore, it is an HTTPS-based service that the RIR customers could use to securely get
+any future RDAP object class. Furthermore, it is an HTTPS-based service that the RIR customers can use to securely get
 this data.
 
 ## Requirements Language
@@ -64,32 +49,36 @@ feature of this service.
 # Bulk Data Format {#bulk_data_format}
 
 The data returned for a Bulk RDAP request ((#bulk_rdap_url)) is a JSON object providing metadata information, followed
-by newline-separated RDAP JSON objects for one or more RDAP object classes.
+by newline-separated data objects for one or more RDAP object classes.
 
 ## Metadata
 
-The following JSON members for metadata MUST be included:
+The JSON metadata object MUST include the following members:
 
-* "extensionId" -- the "nroBulkRdap1" string
+* "extensionId" -- the "nroBulkRdap1" string (see (#rdap_extensions_registry))
 * "versionId" -- a version 4 Universally Unique IDentifier (UUID, [@!RFC9562, section 5.4]) string that MUST be the same
-  for all the bulk data generated for various RDAP object classes at a particular interval (say, on a daily basis)
+  for all the bulk data generated for various RDAP object classes at a particular interval (say, once a day)
 * "producer" -- a string identifying the registry that produced the bulk data, with possible values of "AFRINIC",
-  "APNIC", "ARIN", "LACNIC", "RIPE NCC", or a string literal for a registry at the national or local level
-* "productionDate" -- a string containing the date and time with the UTC offset of the producer when the bulk data being
-  returned was produced
-* "objectCount" -- a number to indicate the number of newline-separated RDAP objects following the metadata object
+  "APNIC", "ARIN", "LACNIC", "RIPE NCC", or an agreed-upon string literal for a registry at the national or local level
+* "productionDate" -- a string containing the date and time with the UTC offset of the producer, indicating when the
+  bulk data being returned was produced
+* "objectCount" -- a positive number representing the count of newline-separated data objects following the metadata
+  object, to help clients detect a partial response for a bulk data request
 
 ## Data
 
-The metadata object is followed by newline-separated RDAP JSON objects for one or more RDAP object classes. Beside
-adhering to the object class definition per [@!RFC9083, section 5], or to the specification of a future RDAP object
+The metadata object is followed by newline-separated data objects for one or more RDAP object classes. Beside
+adhering to the object class definition per [@!RFC9083, section 5] or the specification of a future RDAP object
 class, each returned object has the following characteristics:
 
-* An "rdapConformance" member MUST be included to signify the RDAP extensions used to construct the object.
-* The "self" links for the object, and for the nested objects it contains at the first level, MUST be included to have
-  parity with the "ref" element in the Bulk Whois.
-* For compactness, a nested object MUST NOT include any other data beside its "self" link, "handle" when defined, and
-  relationship to the object (e.g., using the "roles" member in an Entity object to relate to an IP Network object).
+* An "rdapConformance" member ([@!RFC9083, section 4.1]) MUST be included to indicate the RDAP extensions used for
+  constructing the object.
+* The "self" links ([@!RFC9083, section 4.2]) for the object and its first-level nested objects MUST be included. For
+  example, include the "self" links for an entity object and its IP network and autonomous system number objects but not
+  for the entities within those IP network and autonomous system number objects.
+* For compactness, a first-level nested object MUST NOT include any other data beside its "self" link, "handle"
+  (representing a registry-unique identifier for the object) if defined, and relationship to the containing object
+  (e.g., using the "roles" member in a nested entity object to relate to its containing IP network object).
 
 ## Example
 
@@ -192,8 +181,6 @@ Here is an elided example of a bulk data response for the IP Network object clas
 ...
 ```
 
-_Figure 1_
-
 # Extension Identifier
 
 The "nroBulkRdap1" extension identifier (see (#rdap_extensions_registry)) MUST be included as the value for the
@@ -225,9 +212,7 @@ Here is an example URL to get bulk data for the IP Network object class:
 https://example.net/nroBulkRdap1?objectClass=ip%20network
 ```
 
-_Figure 2_
-
-If the RDAP object class listed in the "objectClass" query parameter is valid ([@!RFC9083, section 5], or a future RDAP
+If the RDAP object class listed in the "objectClass" query parameter is valid ([@!RFC9083, section 5] or a future RDAP
 object class) but the bulk data functionality has not been implemented for it, the server SHOULD return a 501 Not
 Implemented response ([@!RFC9110, section 15.6.2]).
 
@@ -239,20 +224,21 @@ Request response ([@!RFC9110, section 15.5.1]).
 The content type for a bulk data response can be:
 
 * "application/rdap+json" -- for a metadata JSON object followed by newline-separated RDAP objects
-* "application/jose" -- for a JWS compact serialization of the metadata and data objects
-* "application/json" -- for a JWS JSON serialization of the metadata and data objects
-* "application/octet-stream" -- for a gzip of either the metadata and data objects or their JWS
+* "application/jose" -- for a JWS (JSON Web Signature) compact serialization ([@!RFC7515, section 3.1]) of the metadata
+  and data objects (see (#security_considerations))
+* "application/json" -- for a JWS JSON serialization ([@!RFC7515, section 3.2]) of the metadata and data objects
+* "application/octet-stream" -- for a gzip ([@RFC1952]) of either the metadata and data objects or their JWS
 
 It is RECOMMENDED that a bulk data response be returned as a gzip with "application/octet-stream" content type.
 
 # Security Considerations {#security_considerations}
 
 It is RECOMMENDED that JSON Web Signature (JWS) [@!RFC7515] and JSON Web Key (JWK) [@!RFC7517] be used to sign and
-validate JSON data for the Bulk RDAP. It is further RECOMMENDED that Elliptic Curve Digital Signature Algorithm (ECDSA)
-([@!RFC7518, section 3.4]) be used for JWS.
+validate the JSON data returned for a Bulk RDAP response. It is further RECOMMENDED that Elliptic Curve Digital
+Signature Algorithm (ECDSA) ([@!RFC7518, section 3.4]) be used for JWS.
 
-Furthermore, it is RECOMMENDED that the guidance from [@!RFC7481, section 3] be followed to secure the Bulk RDAP URL for
-encryption, authentication, and authorization.
+Furthermore, the guidance from [@!RFC7481, section 3] MUST be followed to secure the Bulk RDAP URL for encryption,
+authentication, and authorization.
 
 # Operational Considerations
 
