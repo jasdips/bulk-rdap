@@ -209,12 +209,15 @@ data compactness.
 * Scheme: HTTPS
 * Method: GET
 * Path Segment: nroBulkRdap1?objectClass=<RDAP object class name>
-* Returns: Bulk data as either JSON data ((#bulk_data_format)) or JSON Web Signature (JWS) string
-  ((#security_considerations))
-* Content-Type: application/rdap+json
+* Returns: See (#content_types)
 
-Limiting the query to a single RDAP object class in the Bulk RDAP URL should result in a simpler service implementation,
-as well as better performance when serving requests.
+The HTTPS scheme MUST be used for the Bulk RDAP URL.
+
+When the "objectClass" query parameter is present in the URL, the bulk data response MUST be limited to all the objects
+for the RDAP object class listed in that query parameter.
+
+When the "objectClass" query parameter is absent in the URL, the bulk data response MUST return all the objects for all
+the RDAP object classes the server supports.
 
 Here is an example URL to get bulk data for the IP Network object class:
 
@@ -224,15 +227,23 @@ https://example.net/nroBulkRdap1?objectClass=ip%20network
 
 _Figure 2_
 
-For a 200 OK response ([@!RFC9110, section 15.3.1]), the server MUST return a JSON object with its "objects" member
-filled with all the objects for the RDAP object class listed in the "objectClass" query parameter.
-
 If the RDAP object class listed in the "objectClass" query parameter is valid ([@!RFC9083, section 5], or a future RDAP
 object class) but the bulk data functionality has not been implemented for it, the server SHOULD return a 501 Not
 Implemented response ([@!RFC9110, section 15.6.2]).
 
 If the RDAP object class listed in the "objectClass" query parameter is invalid, the server SHOULD return a 400 Bad
 Request response ([@!RFC9110, section 15.5.1]).
+
+## Content Types {#content_types}
+
+The content type for a bulk data response can be:
+
+* "application/rdap+json" -- for a metadata JSON object followed by newline-separated RDAP objects
+* "application/jose" -- for a JWS compact serialization of the metadata and data objects
+* "application/json" -- for a JWS JSON serialization of the metadata and data objects
+* "application/octet-stream" -- for a gzip of either the metadata and data objects or their JWS
+
+It is RECOMMENDED that a bulk data response be returned as a gzip with "application/octet-stream" content type.
 
 # Security Considerations {#security_considerations}
 
