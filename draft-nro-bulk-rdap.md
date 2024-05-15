@@ -53,7 +53,7 @@ by newline-separated data objects for one or more RDAP object classes ([@!RFC908
 
 ## Metadata
 
-The JSON metadata object MUST include the following members:
+The metadata JSON object MUST include the following members:
 
 * "extensionId" -- the "nroBulkRdap1" string (see (#rdap_extensions_registry))
 * "versionId" -- a version 4 Universally Unique IDentifier (UUID, [@!RFC9562, section 5.4]) string that MUST be the same
@@ -69,7 +69,7 @@ The JSON metadata object MUST include the following members:
 
 The metadata object is followed by newline-separated data objects for one or more RDAP object classes. Beside
 adhering to the object class definition per [@!RFC9083, section 5] or the specification of a future RDAP object
-class, each returned object has the following characteristics:
+class, each returned object has the following requirements:
 
 * An "rdapConformance" member ([@!RFC9083, section 4.1]) MUST be included to indicate the RDAP extensions used for
   constructing the object.
@@ -170,7 +170,7 @@ The following is an elided example of the bulk data generated on a particular da
 ...
 ```
 
-The following is an elided example of the bulk data generated on the same day for all the RDAP object classes an RIR
+The following is an elided example of the bulk data generated on the same day for all the RDAP object classes the RIR
 supports:
 
 ```
@@ -307,13 +307,13 @@ https://example.net/nroBulkRdap1
 The content type for a bulk data response can be:
 
 * "application/rdap+json" -- for a metadata JSON object followed by newline-separated RDAP objects
-* "application/jose" -- for a JWS (JSON Web Signature) compact serialization ([@!RFC7515, section 3.1]) of the metadata
+* "application/jose" -- for JSON Web Signature (JWS) compact serialization ([@!RFC7515, section 3.1]) of the metadata
   and data objects (see (#security_considerations))
-* "application/json" -- for a JWS JSON serialization ([@!RFC7515, section 3.2]) of the metadata and data objects (see
+* "application/json" -- for JWS JSON serialization ([@!RFC7515, section 3.2]) of the metadata and data objects (see
   (#security_considerations))
-* "application/gzip" -- for a gzip ([@RFC1952]) of either the metadata and data objects or their JWS
+* "application/gzip" -- for gzip ([@RFC1952]) of either the metadata and data objects or their JWS
 
-It is RECOMMENDED that a bulk data response be returned as a gzip with "application/gzip" content type.
+It is RECOMMENDED that a bulk data response be returned as gzip with the "application/gzip" content type.
 
 # Security Considerations {#security_considerations}
 
@@ -365,13 +365,13 @@ described here could be used for that purpose in the future.
 
 ## Changes from 00 to 01
 
-* A bulk data response now comprises a metadata object followed by newline-separated RDAP data objects.
+* A bulk data response now comprises a metadata JSON object followed by newline-separated RDAP data objects.
 * Updated the metadata object definition to include the "extensionId", "versionId" (in lieu of "serial"), "producer",
   "productionDate", and "objectCount" fields.
 * Each RDAP data object now has its own "rdapConformance" member to indicate the RDAP extensions used for its
   construction.
 * Clarified requirements for the data objects to help clients consume bulk data consistently across all the RIRs.
-* No more mention of FTP since the HTTPS scheme is now a must.
+* No more mention of FTP since the HTTPS scheme is now a must for the Bulk RDAP.
 * Can now get bulk data for all the RDAP object classes an RIR supports.
 * Clarified available content types for the bulk data and identified the preferred one.
 * Updated the Operational Considerations section for out-of-band JWK distribution and off-line, daily generation of bulk
