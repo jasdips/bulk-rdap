@@ -83,7 +83,7 @@ class, each returned object has the following characteristics:
 
 ## Sample Bulk Data
 
-Here is an elided example of the bulk data generated on a particular day for the IP Network object class:
+The following is an elided example of the bulk data generated on a particular day for the IP Network object class:
 
 ```
 {
@@ -170,7 +170,8 @@ Here is an elided example of the bulk data generated on a particular day for the
 ...
 ```
 
-Here is an elided example of the bulk data generated on the same day for all the RDAP object classes an RIR supports:
+The following is an elided example of the bulk data generated on the same day for all the RDAP object classes an RIR
+supports:
 
 ```
 {
@@ -276,13 +277,13 @@ data compactness.
 
 The HTTPS scheme MUST be used for the Bulk RDAP URL.
 
-When the "objectClass" query parameter is present in the URL, the bulk data response MUST be limited to all the objects
-for the RDAP object class listed in that query parameter.
+When the "objectClass" query parameter is present in the request URL, the bulk data response MUST be limited to all the
+objects for the RDAP object class listed in that query parameter.
 
-When the "objectClass" query parameter is absent in the URL, the bulk data response MUST return all the objects for all
-the RDAP object classes the server supports.
+When the "objectClass" query parameter is absent in the request URL, the bulk data response MUST return all the objects
+for all the RDAP object classes the server supports.
 
-Here is an example URL to get bulk data for the IP Network object class:
+The following is an example URL to get bulk data for the IP Network object class:
 
 ```
 https://example.net/nroBulkRdap1?objectClass=ip%20network
@@ -295,6 +296,12 @@ Implemented response ([@!RFC9110, section 15.6.2]).
 If the RDAP object class listed in the "objectClass" query parameter is invalid, the server SHOULD return a 400 Bad
 Request response ([@!RFC9110, section 15.5.1]).
 
+The following is an example URL to get bulk data for all the RDAP object classes an RIR supports:
+
+```
+https://example.net/nroBulkRdap1
+```
+
 ## Content Types {#content_types}
 
 The content type for a bulk data response can be:
@@ -302,10 +309,11 @@ The content type for a bulk data response can be:
 * "application/rdap+json" -- for a metadata JSON object followed by newline-separated RDAP objects
 * "application/jose" -- for a JWS (JSON Web Signature) compact serialization ([@!RFC7515, section 3.1]) of the metadata
   and data objects (see (#security_considerations))
-* "application/json" -- for a JWS JSON serialization ([@!RFC7515, section 3.2]) of the metadata and data objects
-* "application/octet-stream" -- for a gzip ([@RFC1952]) of either the metadata and data objects or their JWS
+* "application/json" -- for a JWS JSON serialization ([@!RFC7515, section 3.2]) of the metadata and data objects (see
+  (#security_considerations))
+* "application/gzip" -- for a gzip ([@RFC1952]) of either the metadata and data objects or their JWS
 
-It is RECOMMENDED that a bulk data response be returned as a gzip with "application/octet-stream" content type.
+It is RECOMMENDED that a bulk data response be returned as a gzip with "application/gzip" content type.
 
 # Security Considerations {#security_considerations}
 
@@ -313,12 +321,12 @@ It is RECOMMENDED that JSON Web Signature (JWS) [@!RFC7515] and JSON Web Key (JW
 validate the JSON data returned for a Bulk RDAP response. It is further RECOMMENDED that Elliptic Curve Digital
 Signature Algorithm (ECDSA) ([@!RFC7518, section 3.4]) be used for JWS.
 
-Furthermore, the guidance from [@!RFC7481, section 3] MUST be followed to secure the Bulk RDAP URL for encryption,
-authentication, and authorization.
+Furthermore, the guidance from [@!RFC7481, section 3] MUST be followed to secure the Bulk RDAP URL for authentication,
+authorization, and encryption.
 
 # Operational Considerations
 
-If a server uses the JWS to secure bulk data, the related JWK is expected to be distributed out-of-band to the clients.
+If a server uses the JWS to secure bulk data, the related JWK is assumed to be distributed out-of-band to the clients.
 
 Since bulk data generation and optionally signing it are considered computationally expensive, it is RECOMMENDED that
 these operations be performed off-line and once a day.
@@ -352,3 +360,19 @@ Transfer Log Format.
 
 Although there is presently no requirement for the RIRs to escrow their registration data, the JSON data format
 described here could be used for that purpose in the future.
+
+# Change History
+
+## Changes from 00 to 01
+
+* A bulk data response now comprises a metadata object followed by newline-separated RDAP data objects.
+* Updated the metadata object definition to include the "extensionId", "versionId" (in lieu of "serial"), "producer",
+  "productionDate", and "objectCount" fields.
+* Each RDAP data object now has its own "rdapConformance" member to indicate the RDAP extensions used for its
+  construction.
+* Clarified requirements for the data objects to help clients consume bulk data consistently across all the RIRs.
+* No more mention of FTP since the HTTPS scheme is now a must.
+* Can now get bulk data for all the RDAP object classes an RIR supports.
+* Clarified available content types for the bulk data and identified the preferred one.
+* Updated the Operational Considerations section for out-of-band JWK distribution and off-line, daily generation of bulk
+  data.
