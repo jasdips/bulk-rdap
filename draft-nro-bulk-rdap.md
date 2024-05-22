@@ -270,10 +270,10 @@ The "nroBulkRdap1" extension identifier (see (#rdap_extensions_registry)) MUST b
 "extensionId" member in the metadata object of a bulk data response.
 
 The "rdapConformance" array for each returned data object MUST include both the "nroBulkRdap1" extension identifier and
-the extension identifier for
-the [NRO RDAP Profile](https://bitbucket.org/nroecg/nro-rdap-profile/raw/v1/nro-rdap-profile.txt) ("nro_rdap_profile_0"
-as of this writing). In the data objects, the Bulk RDAP extension requirements MUST supersede the NRO RDAP Profile
-extension requirements, primarily to afford bulk data compactness.
+the extension identifier for the
+[NRO RDAP Profile](https://bitbucket.org/nroecg/nro-rdap-profile/raw/v1/nro-rdap-profile.txt) ("nro_rdap_profile_0"as of
+this writing). In the data objects, the Bulk RDAP extension requirements MUST supersede the NRO RDAP Profile extension
+requirements, primarily to afford bulk data compactness.
 
 # Bulk RDAP URL {#bulk_rdap_url}
 
