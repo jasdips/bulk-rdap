@@ -131,7 +131,7 @@ The following is an elided example of the bulk data generated on a particular da
           "href": "https://example.net/entity/AAAA-ARIN",
           "type": "application/rdap+json"
         }
-      ],
+      ]
     },
     ...
   ]
@@ -168,7 +168,7 @@ The following is an elided example of the bulk data generated on a particular da
           "href": "https://example.net/entity/BBBB-ARIN",
           "type": "application/rdap+json"
         }
-      ],
+      ]
     },
     ...
   ]
@@ -219,7 +219,7 @@ supports:
           "href": "https://example.net/entity/AAAA-ARIN",
           "type": "application/rdap+json"
         }
-      ],
+      ]
     },
     ...
   ]
@@ -256,7 +256,7 @@ supports:
           "href": "https://example.net/entity/BBBB-ARIN",
           "type": "application/rdap+json"
         }
-      ],
+      ]
     },
     ...
   ]
