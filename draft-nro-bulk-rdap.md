@@ -8,7 +8,7 @@ name = "Internet-Draft"
 value = "draft-nro-bulk-rdap-01"
 stream = "IETF"
 status = "standard"
-date = 2024-05-14T00:00:00Z
+date = 2024-05-22T00:00:00Z
 
 [[author]]
 organization="Number Resource Organization"
@@ -48,8 +48,10 @@ feature of this service.
 
 # Bulk Data Format {#bulk_data_format}
 
-The data returned for a Bulk RDAP request ((#bulk_rdap_url)) is a JSON object providing metadata information, followed
-by newline-separated data objects for one or more RDAP object classes ([@!RFC9083, section 5]).
+The data returned for a Bulk RDAP request ((#bulk_rdap_url)) is a sequence of JSON objects, each followed by a newline
+('\n') character. Such a sequence is commonly known as [JSON Lines](https://jsonlines.org/), or newline-delimited JSON.
+The first object in the returned sequence provides the metadata information for the bulk data, and the following objects
+are data objects for one or more RDAP object classes ([@!RFC9083, section 5]).
 
 ## Metadata
 
@@ -62,14 +64,14 @@ The metadata JSON object MUST include the following members:
   "APNIC", "ARIN", "LACNIC", "RIPE NCC", or an agreed-upon string literal for a registry at the national or local level
 * "productionDate" -- a string containing the date and time with the UTC offset ([@!RFC3339]) of the producer,
   indicating when the bulk data being returned was produced
-* "objectCount" -- a positive number (greater than 0) representing the count of newline-separated data objects following
-  the metadata object, to help clients detect a partial response for a bulk data request
+* "objectCount" -- a positive number (greater than 0) representing the count of data objects following the metadata
+  object, to help clients detect a partial response for a bulk data request
 
 ## Data
 
-The metadata object is followed by newline-separated data objects for one or more RDAP object classes. Beside
-adhering to the object class definition per [@!RFC9083, section 5] or the specification of a future RDAP object
-class, each returned object has the following requirements:
+The metadata object is followed by data objects for one or more RDAP object classes. Beside adhering to the object class
+definition per [@!RFC9083, section 5] or the specification of a future RDAP object class, each returned object has the
+following requirements:
 
 * An "rdapConformance" member ([@!RFC9083, section 4.1]) MUST be included to indicate the RDAP extensions used for
   constructing the object.
@@ -306,10 +308,9 @@ https://example.net/nroBulkRdap1
 
 The content type for a bulk data response can be:
 
-* "application/rdap+json" -- for a metadata JSON object followed by newline-separated RDAP objects
-* "application/jose" -- for JSON Web Signature (JWS) compact serialization ([@!RFC7515, section 3.1]) of the metadata
-  and data objects (see (#security_considerations))
-* "application/json" -- for JWS JSON serialization ([@!RFC7515, section 3.2]) of the metadata and data objects (see
+* "application/json" -- for a newline-delimited sequence of metadata JSON object and RDAP objects, or for JWS JSON
+   serialization ([@!RFC7515, section 3.2]) of the metadata and data objects (see (#security_considerations))
+* "application/jose" -- for JWS compact serialization ([@!RFC7515, section 3.1]) of the metadata and data objects (see
   (#security_considerations))
 * "application/gzip" -- for gzip ([@RFC1952]) of either the metadata and data objects or their JWS
 
@@ -365,7 +366,7 @@ described here could be used for that purpose in the future.
 
 ## Changes from 00 to 01
 
-* A bulk data response now comprises a metadata JSON object followed by newline-separated RDAP data objects.
+* A bulk data response is now a newline-delimited sequence of metadata JSON object and RDAP objects.
 * Updated the metadata object definition to include the "extensionId", "versionId" (in lieu of "serial"), "producer",
   "productionDate", and "objectCount" fields.
 * Each RDAP data object now has its own "rdapConformance" member to indicate the RDAP extensions used for its
