@@ -3,9 +3,9 @@
 
 
 Network Working Group                       Number Resource Organization
-Internet-Draft                                               15 May 2024
+Internet-Draft                                               22 May 2024
 Intended status: Standards Track                                        
-Expires: 16 November 2024
+Expires: 23 November 2024
 
 
                                Bulk RDAP
@@ -32,7 +32,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 16 November 2024.
+   This Internet-Draft will expire on 23 November 2024.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-                        Expires 16 November 2024                [Page 1]
+                        Expires 23 November 2024                [Page 1]
 
 Internet-Draft                  bulk-rdap                       May 2024
 
@@ -66,21 +66,21 @@ Table of Contents
      2.1.  Metadata  . . . . . . . . . . . . . . . . . . . . . . . .   3
      2.2.  Data  . . . . . . . . . . . . . . . . . . . . . . . . . .   3
      2.3.  Sample Bulk Data  . . . . . . . . . . . . . . . . . . . .   4
-   3.  Extension Identifier  . . . . . . . . . . . . . . . . . . . .   7
+   3.  Extension Identifier  . . . . . . . . . . . . . . . . . . . .   8
    4.  Bulk RDAP URL . . . . . . . . . . . . . . . . . . . . . . . .   8
-     4.1.  Content Types . . . . . . . . . . . . . . . . . . . . . .   8
+     4.1.  Content Types . . . . . . . . . . . . . . . . . . . . . .   9
    5.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
    6.  Operational Considerations  . . . . . . . . . . . . . . . . .   9
    7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
-     7.1.  RDAP Extensions Registry  . . . . . . . . . . . . . . . .   9
+     7.1.  RDAP Extensions Registry  . . . . . . . . . . . . . . . .  10
    8.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  10
    9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  10
      9.1.  Normative References  . . . . . . . . . . . . . . . . . .  10
      9.2.  Informative References  . . . . . . . . . . . . . . . . .  11
    Appendix A.  Other Potential Use Cases  . . . . . . . . . . . . .  11
-     A.1.  Escrow  . . . . . . . . . . . . . . . . . . . . . . . . .  11
-   Appendix B.  Change History . . . . . . . . . . . . . . . . . . .  11
-     B.1.  Changes from 00 to 01 . . . . . . . . . . . . . . . . . .  11
+     A.1.  Escrow  . . . . . . . . . . . . . . . . . . . . . . . . .  12
+   Appendix B.  Change History . . . . . . . . . . . . . . . . . . .  12
+     B.1.  Changes from 00 to 01 . . . . . . . . . . . . . . . . . .  12
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  12
 
 1.  Introduction
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-                        Expires 16 November 2024                [Page 2]
+                        Expires 23 November 2024                [Page 2]
 
 Internet-Draft                  bulk-rdap                       May 2024
 
@@ -123,10 +123,14 @@ Internet-Draft                  bulk-rdap                       May 2024
 
 2.  Bulk Data Format
 
-   The data returned for a Bulk RDAP request (Section 4) is a JSON
-   object providing metadata information, followed by newline-separated
-   data objects for one or more RDAP object classes (Section 5 of
-   [RFC9083]).
+   The data returned for a Bulk RDAP request (Section 4) is a sequence
+   of JSON objects, each followed by a newline ('\n') character.  Such a
+   sequence is commonly known as JSON Lines (https://jsonlines.org/), or
+   newline-delimited JSON, and makes bulk data streaming computationally
+   efficient for the clients.  The first object in the returned sequence
+   provides the metadata information for the bulk data, and the
+   following objects are data objects for one or more RDAP object
+   classes (Section 5 of [RFC9083]).
 
 2.1.  Metadata
 
@@ -145,17 +149,15 @@ Internet-Draft                  bulk-rdap                       May 2024
       UTC offset ([RFC3339]) of the producer, indicating when the bulk
       data being returned was produced
    *  "objectCount" -- a positive number (greater than 0) representing
-      the count of newline-separated data objects following the metadata
-      object, to help clients detect a partial response for a bulk data
-      request
+      the count of data objects following the metadata object, to help
+      clients detect a partial response for a bulk data request
 
 2.2.  Data
 
-   The metadata object is followed by newline-separated data objects for
-   one or more RDAP object classes.  Beside adhering to the object class
-   definition per Section 5 of [RFC9083] or the specification of a
-   future RDAP object class, each returned object has the following
-   requirements:
+   The metadata object is followed by data objects for one or more RDAP
+   object classes.  Beside adhering to the object class definition per
+   Section 5 of [RFC9083] or the specification of a future RDAP object
+   class, each returned object has the following requirements:
 
    *  An "rdapConformance" member (Section 4.1 of [RFC9083]) MUST be
       included to indicate the RDAP extensions used for constructing the
@@ -163,25 +165,27 @@ Internet-Draft                  bulk-rdap                       May 2024
 
 
 
-
-
-                        Expires 16 November 2024                [Page 3]
+                        Expires 23 November 2024                [Page 3]
 
 Internet-Draft                  bulk-rdap                       May 2024
 
 
+   *  For data compactness, the object MUST include only its first-level
+      nested objects and no more.  For example, an entity object
+      (representing an organization) can contain IP network and
+      autonomous system number objects but not the entity objects for
+      those IP network and autonomous system number objects.
    *  The "self" links (Section 4.2 of [RFC9083]) for the object and its
       first-level nested objects MUST be included.  For example, include
       the "self" links for an entity object (representing an
       organization) and its IP network and autonomous system number
-      objects but not for the entities within those IP network and
-      autonomous system number objects.
-   *  For compactness, a first-level nested object MUST NOT include any
-      other data beside its "self" link, "handle" (representing a
-      registry-unique identifier for the object) if defined, and
-      relationship to the containing object (e.g., using the "roles"
-      member in a nested entity object to relate to its containing IP
-      network object).
+      objects.
+   *  For further data compactness, a first-level nested object MUST NOT
+      include any other data beside its "self" link, "handle"
+      (representing a registry-unique identifier for the object) if
+      defined, and relationship to the containing object if defined (for
+      example, using the "roles" member in a nested entity object to
+      relate to its containing IP network object).
 
 2.3.  Sample Bulk Data
 
@@ -214,18 +218,18 @@ Internet-Draft                  bulk-rdap                       May 2024
     ...
   ],
   "entities":
-  [
-    {
-      "objectClassName": "entity",
-      "handle": "AAAA-ARIN",
 
 
 
-                        Expires 16 November 2024                [Page 4]
+                        Expires 23 November 2024                [Page 4]
 
 Internet-Draft                  bulk-rdap                       May 2024
 
 
+  [
+    {
+      "objectClassName": "entity",
+      "handle": "AAAA-ARIN",
       "roles": [ "administrative", ... ]
       "links":
       [
@@ -270,18 +274,18 @@ Internet-Draft                  bulk-rdap                       May 2024
           "value": "https://example.net/ip/2001:db8:1::/48",
           "rel": "self",
           "href": "https://example.net/entity/BBBB-ARIN",
-          "type": "application/rdap+json"
-        }
-      ],
-    },
 
 
 
-                        Expires 16 November 2024                [Page 5]
+                        Expires 23 November 2024                [Page 5]
 
 Internet-Draft                  bulk-rdap                       May 2024
 
 
+          "type": "application/rdap+json"
+        }
+      ],
+    },
     ...
   ]
 }
@@ -326,18 +330,18 @@ Internet-Draft                  bulk-rdap                       May 2024
         {
           "value": "https://example.net/ip/2001:db8::/48",
           "rel": "self",
-          "href": "https://example.net/entity/AAAA-ARIN",
-          "type": "application/rdap+json"
-        }
-      ],
 
 
 
-                        Expires 16 November 2024                [Page 6]
+                        Expires 23 November 2024                [Page 6]
 
 Internet-Draft                  bulk-rdap                       May 2024
 
 
+          "href": "https://example.net/entity/AAAA-ARIN",
+          "type": "application/rdap+json"
+        }
+      ],
     },
     ...
   ]
@@ -381,25 +385,29 @@ Internet-Draft                  bulk-rdap                       May 2024
 }
 ...
 
+
+
+
+
+                        Expires 23 November 2024                [Page 7]
+
+Internet-Draft                  bulk-rdap                       May 2024
+
+
 3.  Extension Identifier
 
    The "nroBulkRdap1" extension identifier (see Section 7.1) MUST be
    included as the value for the "extensionId" member in the metadata
    object of a bulk data response.
 
-
-
-                        Expires 16 November 2024                [Page 7]
-
-Internet-Draft                  bulk-rdap                       May 2024
-
-
    The "rdapConformance" array for each returned data object MUST
    include both the "nroBulkRdap1" extension identifier and the
-   extension identifier for the NRO RDAP Profile ("nro_rdap_profile_0"
-   as of this writing).  In the data objects, the Bulk RDAP extension
-   requirements MUST supersede the NRO RDAP Profile extension
-   requirements, primarily to afford bulk data compactness.
+   extension identifier for the NRO RDAP Profile
+   (https://bitbucket.org/nroecg/nro-rdap-profile/raw/v1/nro-rdap-
+   profile.txt) ("nro_rdap_profile_0" as of this writing).  In the data
+   objects, the Bulk RDAP extension requirements MUST supersede the NRO
+   RDAP Profile extension requirements, primarily to afford bulk data
+   compactness.
 
 4.  Bulk RDAP URL
 
@@ -433,6 +441,15 @@ Internet-Draft                  bulk-rdap                       May 2024
    is invalid, the server SHOULD return a 400 Bad Request response
    (Section 15.5.1 of [RFC9110]).
 
+
+
+
+
+                        Expires 23 November 2024                [Page 8]
+
+Internet-Draft                  bulk-rdap                       May 2024
+
+
    The following is an example URL to get bulk data for all the RDAP
    object classes an RIR supports:
 
@@ -442,21 +459,12 @@ Internet-Draft                  bulk-rdap                       May 2024
 
    The content type for a bulk data response can be:
 
-
-
-
-                        Expires 16 November 2024                [Page 8]
-
-Internet-Draft                  bulk-rdap                       May 2024
-
-
-   *  "application/rdap+json" -- for a metadata JSON object followed by
-      newline-separated RDAP objects
-   *  "application/jose" -- for JSON Web Signature (JWS) compact
-      serialization (Section 3.1 of [RFC7515]) of the metadata and data
-      objects (see Section 5)
-   *  "application/json" -- for JWS JSON serialization (Section 3.2 of
-      [RFC7515]) of the metadata and data objects (see Section 5)
+   *  "application/json" -- for a newline-delimited sequence of metadata
+      JSON object and RDAP objects, or for JWS JSON serialization
+      (Section 3.2 of [RFC7515]) of the metadata and data objects (see
+      Section 5)
+   *  "application/jose" -- for JWS compact serialization (Section 3.1
+      of [RFC7515]) of the metadata and data objects (see Section 5)
    *  "application/gzip" -- for gzip ([RFC1952]) of either the metadata
       and data objects or their JWS
 
@@ -486,6 +494,18 @@ Internet-Draft                  bulk-rdap                       May 2024
 
 7.  IANA Considerations
 
+
+
+
+
+
+
+
+                        Expires 23 November 2024                [Page 9]
+
+Internet-Draft                  bulk-rdap                       May 2024
+
+
 7.1.  RDAP Extensions Registry
 
    IANA is requested to register the following value in the RDAP
@@ -498,14 +518,6 @@ Internet-Draft                  bulk-rdap                       May 2024
    *  Published specification: This document.
    *  Contact: Number Resource Organization (NRO) secretariat@nro.net
       (mailto:secretariat@nro.net)
-
-
-
-                        Expires 16 November 2024                [Page 9]
-
-Internet-Draft                  bulk-rdap                       May 2024
-
-
    *  Intended usage: This NRO-level extension describes version 1 of a
       method to access registration data in bulk from the RIRs through
       RDAP.
@@ -541,6 +553,15 @@ Internet-Draft                  bulk-rdap                       May 2024
               Signature (JWS)", RFC 7515, DOI 10.17487/RFC7515, May
               2015, <https://www.rfc-editor.org/info/rfc7515>.
 
+
+
+
+
+                        Expires 23 November 2024               [Page 10]
+
+Internet-Draft                  bulk-rdap                       May 2024
+
+
    [RFC7517]  Jones, M., "JSON Web Key (JWK)", RFC 7517,
               DOI 10.17487/RFC7517, May 2015,
               <https://www.rfc-editor.org/info/rfc7517>.
@@ -552,15 +573,6 @@ Internet-Draft                  bulk-rdap                       May 2024
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/info/rfc8174>.
-
-
-
-
-
-                        Expires 16 November 2024               [Page 10]
-
-Internet-Draft                  bulk-rdap                       May 2024
-
 
    [RFC9083]  Hollenbeck, S. and A. Newton, "JSON Responses for the
               Registration Data Access Protocol (RDAP)", STD 95,
@@ -596,6 +608,16 @@ Internet-Draft                  bulk-rdap                       May 2024
 
 Appendix A.  Other Potential Use Cases
 
+
+
+
+
+
+                        Expires 23 November 2024               [Page 11]
+
+Internet-Draft                  bulk-rdap                       May 2024
+
+
 A.1.  Escrow
 
    Although there is presently no requirement for the RIRs to escrow
@@ -606,18 +628,8 @@ Appendix B.  Change History
 
 B.1.  Changes from 00 to 01
 
-   *  A bulk data response now comprises a metadata JSON object followed
-      by newline-separated RDAP data objects.
-
-
-
-
-
-                        Expires 16 November 2024               [Page 11]
-
-Internet-Draft                  bulk-rdap                       May 2024
-
-
+   *  A bulk data response is now a newline-delimited sequence of
+      metadata JSON object and RDAP objects.
    *  Updated the metadata object definition to include the
       "extensionId", "versionId" (in lieu of "serial"), "producer",
       "productionDate", and "objectCount" fields.
@@ -657,16 +669,4 @@ Author's Address
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-                        Expires 16 November 2024               [Page 12]
+                        Expires 23 November 2024               [Page 12]
