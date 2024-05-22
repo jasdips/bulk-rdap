@@ -49,7 +49,8 @@ feature of this service.
 # Bulk Data Format {#bulk_data_format}
 
 The data returned for a Bulk RDAP request ((#bulk_rdap_url)) is a sequence of JSON objects, each followed by a newline
-('\n') character. Such a sequence is commonly known as [JSON Lines](https://jsonlines.org/), or newline-delimited JSON.
+('\n') character. Such a sequence is commonly known as [JSON Lines](https://jsonlines.org/), or newline-delimited JSON,
+and makes bulk data streaming computationally efficient for the clients.
 The first object in the returned sequence provides the metadata information for the bulk data, and the following objects
 are data objects for one or more RDAP object classes ([@!RFC9083, section 5]).
 
