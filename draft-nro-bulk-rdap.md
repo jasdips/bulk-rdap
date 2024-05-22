@@ -75,13 +75,16 @@ following requirements:
 
 * An "rdapConformance" member ([@!RFC9083, section 4.1]) MUST be included to indicate the RDAP extensions used for
   constructing the object.
+* For data compactness, the object MUST include only its first-level nested objects and no more. For example, an
+  entity object (representing an organization) can contain IP network and autonomous system number objects but not the
+  entity objects for those IP network and autonomous system number objects.
 * The "self" links ([@!RFC9083, section 4.2]) for the object and its first-level nested objects MUST be included. For
   example, include the "self" links for an entity object (representing an organization) and its IP network and
-  autonomous system number objects but not for the entities within those IP network and autonomous system number
-  objects.
-* For compactness, a first-level nested object MUST NOT include any other data beside its "self" link, "handle"
-  (representing a registry-unique identifier for the object) if defined, and relationship to the containing object
-  (e.g., using the "roles" member in a nested entity object to relate to its containing IP network object).
+  autonomous system number objects.
+* For further data compactness, a first-level nested object MUST NOT include any other data beside its "self" link,
+  "handle" (representing a registry-unique identifier for the object) if defined, and relationship to the containing
+  object if defined (for example, using the "roles" member in a nested entity object to relate to its containing IP
+  network object).
 
 ## Sample Bulk Data
 
