@@ -239,7 +239,7 @@ Internet-Draft                  bulk-rdap                       May 2024
           "href": "https://example.net/entity/AAAA-ARIN",
           "type": "application/rdap+json"
         }
-      ],
+      ]
     },
     ...
   ]
@@ -284,7 +284,7 @@ Internet-Draft                  bulk-rdap                       May 2024
 
           "type": "application/rdap+json"
         }
-      ],
+      ]
     },
     ...
   ]
@@ -341,7 +341,7 @@ Internet-Draft                  bulk-rdap                       May 2024
           "href": "https://example.net/entity/AAAA-ARIN",
           "type": "application/rdap+json"
         }
-      ],
+      ]
     },
     ...
   ]
@@ -378,7 +378,7 @@ Internet-Draft                  bulk-rdap                       May 2024
           "href": "https://example.net/entity/BBBB-ARIN",
           "type": "application/rdap+json"
         }
-      ],
+      ]
     },
     ...
   ]
