@@ -8,7 +8,7 @@ name = "Internet-Draft"
 value = "draft-nro-bulk-rdap-01"
 stream = "IETF"
 status = "standard"
-date = 2024-05-22T00:00:00Z
+date = 2024-05-23T00:00:00Z
 
 [[author]]
 organization="Number Resource Organization"
@@ -19,16 +19,18 @@ email = "secretariat@nro.net"
 
 .# Abstract
 
-To complement the move from Whois to RDAP for the Regional Internet Registries (RIRs), this document specifies a new
-service, named the Bulk RDAP, that an RIR can deploy in lieu of its Bulk Whois service.
+The Registration Data Access Protocol (RDAP) is used by Regional Internet Registries (RIRs) and Domain Name Registries
+(DNRs) to provide access to their resource registration information. For the corresponding Whois service, RIRs generally
+publish the information in bulk format, for use cases where the standard query service is not suitable. This document
+defines a similar bulk service for use with RDAP.
 
 {mainmatter}
 
 # Introduction
 
 As the RIRs shift from Whois to RDAP, they also need an RDAP counterpart for their Bulk Whois service. To that end, this
-document specifies a new service, named the Bulk RDAP, that an RIR can deploy to replace the Bulk Whois. This service is
-intended to be a simple, easy-to-implement replacement.
+document specifies a new service, named the Bulk RDAP, that an RIR can deploy to provide access to RDAP data in bulk
+format.
 
 At a higher level, the Bulk RDAP comprises JSON data for IP Network, Autonomous System Number, Domain, Nameserver, and
 Entity object classes ([@!RFC9083, section 5]), plus some JSON metadata. It can be easily extended to include data for
