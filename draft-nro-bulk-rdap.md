@@ -66,8 +66,8 @@ The metadata JSON object MUST include the following members:
   "versionId" are combined, the result is consistent as among its records.
 * "producer" -- a string identifying the registry that produced the bulk data, with possible values of "AFRINIC",
   "APNIC", "ARIN", "LACNIC", "RIPE NCC", or an agreed-upon string literal for a registry at the national or local level
-* "productionDate" -- a string containing the date and time with the UTC offset ([@!RFC3339]) of the producer,
-  indicating when the bulk data being returned was produced
+* "productionDate" -- a string containing the date and time in Zulu format with UTC offset of 00:00 ([@!RFC3339]),
+  indicating when the bulk data being returned was produced; for example, "2024-05-23T19:30:32Z"
 * "objectCount" -- a positive number (greater than 0) representing the count of data objects following the metadata
   object, to help clients detect a partial response for a bulk data request
 
