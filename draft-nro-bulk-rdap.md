@@ -51,10 +51,10 @@ feature of this service.
 # Bulk Data Format {#bulk_data_format}
 
 The data returned for a Bulk RDAP request ((#bulk_rdap_url)) is a JSON Text Sequence ([@!RFC7464]) of JSON objects, with
-each object prefixed by an ASCII Record Separator (0x1E) and ending with an ASCII Line Feed character (0x0A). The first
-object in the returned sequence provides the metadata information for the bulk data, and the following objects are data
-objects for one or more RDAP object classes ([@!RFC9083, section 5]). This data format should make bulk data streaming
-computationally efficient for the clients.
+each object prefixed by an ASCII Record Separator character (0x1E) and ending with an ASCII Line Feed character (0x0A).
+The first object in the returned sequence provides the metadata information for the bulk data, and the following objects
+are data objects for one or more RDAP object classes ([@!RFC9083, section 5]). This data format should make bulk data
+streaming computationally efficient for the clients.
 
 ## Metadata
 
@@ -93,7 +93,7 @@ following requirements:
 ## Sample Bulk Data
 
 The following is an elided example of the bulk data generated on a particular day for the IP Network object class
-(not showing the ASCII Record Separator (0x1E) for each JSON object):
+(not showing the ASCII Record Separator character (0x1E) for each JSON object):
 
 ```
 {
@@ -181,7 +181,7 @@ The following is an elided example of the bulk data generated on a particular da
 ```
 
 The following is an elided example of the bulk data generated on the same day for all the RDAP object classes the RIR
-supports (not showing the ASCII Record Separator (0x1E) for each JSON object):
+supports (not showing the ASCII Record Separator character (0x1E) for each JSON object):
 
 ```
 {
