@@ -50,11 +50,11 @@ feature of this service.
 
 # Bulk Data Format {#bulk_data_format}
 
-The data returned for a Bulk RDAP request ((#bulk_rdap_url)) is a sequence of JSON objects, each followed by a newline
-('\n') character. Such a sequence is commonly known as [JSON Lines](https://jsonlines.org/), or newline-delimited JSON,
-and makes bulk data streaming computationally efficient for the clients.
-The first object in the returned sequence provides the metadata information for the bulk data, and the following objects
-are data objects for one or more RDAP object classes ([@!RFC9083, section 5]).
+The data returned for a Bulk RDAP request ((#bulk_rdap_url)) is a JSON Text Sequence ([@!RFC7464]) of JSON objects, with
+each object prefixed by an ASCII Record Separator (0x1E) and ending with an ASCII Line Feed character (0x0A). The first
+object in the returned sequence provides the metadata information for the bulk data, and the following objects are data
+objects for one or more RDAP object classes ([@!RFC9083, section 5]). This data format should make bulk data streaming
+computationally efficient for the clients.
 
 ## Metadata
 
@@ -92,7 +92,8 @@ following requirements:
 
 ## Sample Bulk Data
 
-The following is an elided example of the bulk data generated on a particular day for the IP Network object class:
+The following is an elided example of the bulk data generated on a particular day for the IP Network object class
+(not showing the ASCII Record Separator (0x1E) for each JSON object):
 
 ```
 {
@@ -180,7 +181,7 @@ The following is an elided example of the bulk data generated on a particular da
 ```
 
 The following is an elided example of the bulk data generated on the same day for all the RDAP object classes the RIR
-supports:
+supports (not showing the ASCII Record Separator (0x1E) for each JSON object):
 
 ```
 {
@@ -316,11 +317,12 @@ https://example.net/nroBulkRdap1
 
 The content type for a bulk data response can be:
 
-* "application/json" -- for a newline-delimited sequence of metadata JSON object and RDAP objects, or for JWS JSON
-  serialization ([@!RFC7515, section 3.2]) of the metadata and data objects (see (#security_considerations))
+* "application/json-seq" -- for a JSON Text Sequence ([@!RFC7464]) of metadata JSON object and RDAP objects
 * "application/jose" -- for JWS compact serialization ([@!RFC7515, section 3.1]) of the metadata and data objects (see
   (#security_considerations))
-* "application/gzip" -- for gzip ([@RFC1952]) of either the metadata and data objects or their JWS
+* "application/json" -- for JWS JSON serialization ([@!RFC7515, section 3.2]) of the metadata and data objects (see
+  (#security_considerations))
+* "application/gzip" -- for gzip ([@!RFC1952] [@!RFC6713]) of either the metadata and data objects or their JWS
 
 It is RECOMMENDED that a bulk data response be returned as gzip with the "application/gzip" content type.
 
@@ -374,7 +376,7 @@ described here could be used for that purpose in the future.
 
 ## Changes from 00 to 01
 
-* A bulk data response is now a newline-delimited sequence of metadata JSON object and RDAP objects.
+* A bulk data response is now a JSON Text Sequence of metadata JSON object and RDAP objects.
 * Updated the metadata object definition to include the "extensionId", "versionId" (in lieu of "serial"), "producer",
   "productionDate", and "objectCount" fields.
 * Each RDAP data object now has its own "rdapConformance" member to indicate the RDAP extensions used for its
