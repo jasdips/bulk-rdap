@@ -298,15 +298,16 @@ If a registry has implemented the
 "nro_rdap_profile_0" MUST be included in the "rdapConformance" member of the metadata object, and in the
 "rdapConformance" member of each data object.
 
-If both Bulk RDAP and NRO RDAP Profile extensions are used in a bulk data response, Bulk RDAP extension requirements
-MUST take precedence over NRO RDAP Profile requirements for data objects; primarily to afford bulk data compactness.
+If both the Bulk RDAP and NRO RDAP Profile extensions are used in a bulk data response, the Bulk RDAP extension
+requirements MUST take precedence over the NRO RDAP Profile requirements for data objects; primarily to afford bulk data
+compactness.
 
 # Bulk RDAP URL {#bulk_rdap_url}
 
 * Scheme: HTTPS
 * Method: GET
 * Path Segment: nroBulkRdap1?objectClass=<RDAP object class name>
-* Returns: See (#content_types)
+* Returns: See (#content_type) and (#content_encoding)
 
 The HTTPS scheme MUST be used for the Bulk RDAP URL.
 
@@ -335,18 +336,24 @@ The following is an example URL to get bulk data for all the RDAP object classes
 https://example.net/nroBulkRdap1
 ```
 
-## Content Types {#content_types}
+## Content Type {#content_type}
 
-The content type for a bulk data response can be:
+The Content-Type header in a bulk data response MUST be set to one of the following:
 
 * "application/json-seq" -- for a JSON Text Sequence ([@!RFC7464]) of metadata JSON object and RDAP objects
 * "application/jose" -- for JWS compact serialization ([@!RFC7515, section 3.1]) of the metadata and data objects (see
   (#security_considerations))
 * "application/json" -- for JWS JSON serialization ([@!RFC7515, section 3.2]) of the metadata and data objects (see
   (#security_considerations))
-* "application/gzip" -- for gzip ([@!RFC1952] [@!RFC6713]) of either the metadata and data objects or their JWS
 
-It is RECOMMENDED that a bulk data response be returned as gzip with the "application/gzip" content type.
+## Content Encoding {#content_encoding}
+
+Since the bulk data responses are likely to be large, servers and clients are RECOMMENDED to set the Content-Encoding
+header to "gzip" in order to reduce the amount of data that is transmitted.
+
+Depending on the headers set by the client, the server may not be able to do this compression, in which case it could
+opt to fall back to an uncompressed response, or return a 406 Not Acceptable response ([@!RFC9110, section 15.5.7]),
+effectively requiring the client to support gzip.
 
 # Security Considerations {#security_considerations}
 
@@ -406,6 +413,6 @@ described here could be used for that purpose in the future.
 * Clarified requirements for the data objects to help clients consume bulk data consistently across all the RIRs.
 * No more mention of FTP since the HTTPS scheme is now a must for the Bulk RDAP.
 * Can now get bulk data for all the RDAP object classes an RIR supports.
-* Clarified available content types for the bulk data and identified the preferred one.
+* Clarified content type and encoding for the bulk data.
 * Updated the Operational Considerations section for out-of-band JWK distribution and off-line, daily generation of bulk
   data.
