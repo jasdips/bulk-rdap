@@ -286,7 +286,7 @@ it supports (note that the ASCII Record Separator character (0x1E) for each JSON
 
 # Extension Identifier
 
-When a bulk data response originates from an RIR, then the "nroBulkRdap1" extension identifier (see
+When a bulk data response originates from an RIR, the "nroBulkRdap1" extension identifier (see
 (#rdap_extensions_registry)) MUST be included in the "rdapConformance" member of the metadata object, and in the
 "rdapConformance" member of each data object. This requirement also applies to a national or local registry.
 
@@ -294,13 +294,12 @@ The clients which host the downloaded bulk data MUST omit the "nroBulkRdap1" ext
 objects in responses for non-bulk contexts.
 
 If a registry has implemented the
-[NRO RDAP Profile](https://bitbucket.org/nroecg/nro-rdap-profile/raw/v1/nro-rdap-profile.txt), then the extension
-identifier "nro_rdap_profile_0" MUST be included in the "rdapConformance" member of the metadata object, and in the
+[NRO RDAP Profile](https://bitbucket.org/nroecg/nro-rdap-profile/raw/v1/nro-rdap-profile.txt), the extension identifier
+"nro_rdap_profile_0" MUST be included in the "rdapConformance" member of the metadata object, and in the
 "rdapConformance" member of each data object.
 
-If both the Bulk RDAP and NRO RDAP Profile extensions are used in a bulk data response, then the Bulk RDAP extension
-requirements MUST take precedence over the NRO RDAP Profile requirements for data objects, primarily to afford bulk data
-compactness.
+If both Bulk RDAP and NRO RDAP Profile extensions are used in a bulk data response, Bulk RDAP extension requirements
+MUST take precedence over NRO RDAP Profile requirements for data objects; primarily to afford bulk data compactness.
 
 # Bulk RDAP URL {#bulk_rdap_url}
 
