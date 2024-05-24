@@ -286,14 +286,21 @@ it supports (note that the ASCII Record Separator character (0x1E) for each JSON
 
 # Extension Identifier
 
-The "nroBulkRdap1" extension identifier (see (#rdap_extensions_registry)) MUST be included as the value for the
-"extensionId" member in the metadata object of a bulk data response.
+When a bulk data response originates from an RIR, then the "nroBulkRdap1" extension identifier (see
+(#rdap_extensions_registry)) MUST be included in the "rdapConformance" member of the metadata object, and in the
+"rdapConformance" member of each data object. This requirement also applies to a national or local registry.
 
-The "rdapConformance" array for each returned data object MUST include both the "nroBulkRdap1" extension identifier and
-the extension identifier for the
-[NRO RDAP Profile](https://bitbucket.org/nroecg/nro-rdap-profile/raw/v1/nro-rdap-profile.txt) ("nro_rdap_profile_0" as
-of this writing). In the data objects, the Bulk RDAP extension requirements MUST supersede the NRO RDAP Profile
-extension requirements, primarily to afford bulk data compactness.
+The clients which host the downloaded bulk data MUST omit the "nroBulkRdap1" extension identifier when including data
+objects in responses for non-bulk contexts.
+
+If a registry has implemented the
+[NRO RDAP Profile](https://bitbucket.org/nroecg/nro-rdap-profile/raw/v1/nro-rdap-profile.txt), then the extension
+identifier "nro_rdap_profile_0" MUST be included in the "rdapConformance" member of the metadata object, and in the
+"rdapConformance" member of each data object.
+
+If both the Bulk RDAP and NRO RDAP Profile extensions are used in a bulk data response, then the Bulk RDAP extension
+requirements MUST take precedence over the NRO RDAP Profile requirements for data objects, primarily to afford bulk data
+compactness.
 
 # Bulk RDAP URL {#bulk_rdap_url}
 
@@ -393,8 +400,8 @@ described here could be used for that purpose in the future.
 ## Changes from 00 to 01
 
 * A bulk data response is now a JSON Text Sequence of metadata JSON object and RDAP objects.
-* Updated the metadata object definition to include the "extensionId", "versionId" (in lieu of "serial"), "producer",
-  "productionDate", and "objectCount" fields.
+* Updated the metadata object definition to include the "rdapConformance", "versionId" (in lieu of "serial"),
+  "producer", "productionDate", and "objectCount" fields.
 * Each RDAP data object now has its own "rdapConformance" member to indicate the RDAP extensions used for its
   construction.
 * Clarified requirements for the data objects to help clients consume bulk data consistently across all the RIRs.
